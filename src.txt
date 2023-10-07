@@ -1,1 +1,15 @@
-push 3000
+push -16
+push -16
+mul
+push 4
+push 10
+mul
+push 4
+mul
+sub
+c_sqrt 96
+c_sin 0.5
+c_cos 10
+out
+hlt
+
