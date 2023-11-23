@@ -1,10 +1,16 @@
-push -16
-push -16
+in
+pop ax
+in
+pop bx
+in
+pop cx
+push bx
+push bx
 mul
 push 4
-push 10
+push ax
+push cx
 mul
-push 4
 mul
 sub
 out

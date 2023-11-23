@@ -2,6 +2,9 @@
 #include <string.h>
 #include <assert.h>
 #include "../library/stack.h"
+#include "../include/processor.h"
+#include "../include/config.h"
+
 
 const char *commands[] = {
     "push",   // 0
@@ -54,34 +57,28 @@ const int COMPLETED = 0;
 typedef double NUM_T;
 #define NUM_MOD "%lf"
 
-struct COMMANDS{
-    short push   : 2;
-    short pop    : 1;
-    short c_sqrt : 1;
-    short c_sin  : 1;
-    short c_cos  : 1;
-    short in     : 1;
-    short add    : 1;
-    short sub    : 1;
-    short mul    : 1;
-    short c_div  : 1;
-    short out    : 1;
-    short hlt    : 1;
-};
+// struct COMMANDS{
+//     short push   : 2;
+//     short pop    : 1;
+//     short c_sqrt : 1;
+//     short c_sin  : 1;
+//     short c_cos  : 1;
+//     short in     : 1;
+//     short add    : 1;
+//     short sub    : 1;
+//     short mul    : 1;
+//     short c_div  : 1;
+//     short out    : 1;
+//     short hlt    : 1;
+// };
 
 int main()
 {
-    // printf("%lu\n", sizeof(short));
-
-    Stack stk = {};
-    StackCtor(&stk, 10);
-
-    // char command_char[size_comm] = "venom";
-    double num = 0;
+	Storage str = {};
+	StorageCtor(&str);
 
     FILE *fp_src = fopen(NAME_SRC_FILE, "r");
     assert(fp_src != NULL);
-    // size_t size_commands = sizeof(commands) / sizeof(commands[0]);
 
     while (!feof(fp_src))
     {
@@ -199,4 +196,13 @@ int main()
             break;
         }
     }
+}
+
+int StorageCtor(Storage *str)
+{
+	StackCtor(&str->stk, std_stack_cap);
+	str->ax = VENOM_ELEM;
+	str->bx = VENOM_ELEM;
+	str->cx = VENOM_ELEM;
+	str->dx = VENOM_ELEM;
 }
