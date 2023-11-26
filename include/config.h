@@ -1,8 +1,13 @@
+#ifndef CONFIG_H
+#define CONFIG_H
+
 #include <stdio.h>
 
 const size_t std_stack_cap = 10;
 
-const char *NAME_SRC = "src.txt";
-const char *NAME_RES = "res_asm.txt";
+typedef double NUM_T;
 
-const size_t NUMBER_INSTRUCTIONS = 12;
+#define NUM_MOD_PRINT "%.2lf"
+#define NUM_MOD_SCAN  "%lf"
+
+#endif
