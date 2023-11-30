@@ -1,3 +1,4 @@
+#!/bin/zsh
 
 CXXFLAGS="-D _DEBUG -ggdb3 -g -std=c++23 -O0 -Wall -Wextra -Weffc++ \
 -Waggressive-loop-optimizations -Wc++14-compat -Wmissing-declarations  \
@@ -20,4 +21,9 @@ integer-divide-by-zero,leak,nonnull-attribute,null,object-size,return,\
 returns-nonnull-attribute,shift,signed-integer-overflow,undefined,\
 unreachable,vla-bound,vptr"
 
-g++ $CXXFLAGS processor/src/main.cpp processor/src/processor.cpp -o main -lmystack
+if ./dasm
+then
+echo ""
+else
+g++ $CXXFLAGS disassembler/src/dasm.cpp -o dasm && ./dasm
+fi

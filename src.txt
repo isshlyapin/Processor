@@ -1,15 +1,15 @@
 in
-pop ax
+pop rax
 in
-pop bx
+pop rbx
 in
-pop cx
-push bx
-push bx
+pop rcx
+push rbx
+push rbx
 mul
 push 4
-push ax
-push cx
+push rax
+push rcx
 mul
 mul
 sub
