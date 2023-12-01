@@ -2,30 +2,11 @@
 #include "../../library/stack.h"
 #include "../../library/commands.h"
 #include "../../library/color.h"
+
 static const size_t max_size_c        = 100;
 static const num_t  VENOM_NUM_COMMAND = -13;
+static const double EPSILON = 1e-9;
 
-#define INFO
-
-enum REGISTER{
-	rax = 1,
-	rbx,
-	rcx,
-	rdx
-};
-
-const char* REGISTER[] = {
-	"VENOM",
-	"rax",
-	"rbx",
-	"rcx",
-	"rdx",
-};
-
-int call_asm()
-{
-	return system("./run_asm.sh");
-}
 int StorageCtor(Storage *str)
 {
 	StackCtor(&str->stk, std_stack_cap);
@@ -80,7 +61,7 @@ int process_commands(FILE *fp_src, Storage *str)
 {
 	printf("\n___%sWORKING PROCESSOR%s___\n\n", GREEN, RESET);
 
-	num_t command = VENOM_NUM_COMMAND;
+	int command = VENOM_NUM_COMMAND;
 
 	size_t sz_src_file = 0;
 	char *buf = create_buf(fp_src, &sz_src_file);
@@ -90,17 +71,17 @@ int process_commands(FILE *fp_src, Storage *str)
 
 	for (size_t pc = 0; pc < number_commands;)
     {
-		command = *((num_t*)buf + pc);
+		command = (int)*((num_t*)buf + pc);
 
 		#ifdef INFO
-        if ((int)command == hlt)
+        if (command == cmd_hlt)
 		{
             printf("%s[%s]%s", GREEN, commands[NUMBER_INSTRUCTIONS], RESET); // last index always hlt
         	printf("%s[%d]%s\n", MAGENTA, (int)command, RESET);
 		}
-		else if ((int)command == r_push)
+		else if (command == cmd_rpush)
 		{
-			printf("%s[%s]%s", GREEN, commands[push], RESET);
+			printf("%s[%s]%s", GREEN, commands[cmd_push], RESET);
         	printf("%s[%d]%s\n", MAGENTA, (int)command, RESET);
 		}
 		else
@@ -113,115 +94,180 @@ int process_commands(FILE *fp_src, Storage *str)
 		num_t num2 = VENOM_ELEM;
         num_t num1 = VENOM_ELEM;
 
-		switch ((int)command)
+		switch (command)
         {
-        case push:
-			num1 = *((num_t*)buf + pc + 1);
-            printf("Numeric from file: <" NUM_MOD_PRINT ">\n", num1); ////
-            StackPush(&str->stk, num1);
-            printf("\n");
-			pc += 2;
-            break;
+			case cmd_push:
+				num1 = *((num_t*)buf + pc + 1);
+				StackPush(&str->stk, num1);
+				pc += 2;
 
-		case r_push:
-			num1 = *((num_t*)buf + pc + 1);
-            printf("Register from file: <%s>\n", REGISTER[(int)num1]); ////
-            StackPush(&str->stk, *ptr_reg(str, num1));
-            printf("\n");
-			pc += 2;
-            break;	
+				#ifdef INFO
+				printf("Numeric from file: <" NUM_MOD_PRINT ">\n", num1);
+				#endif
 
-		case pop:
-			num1 = *((num_t*)buf + pc + 1);
-            printf("Register from file: <%s>\n", REGISTER[(int)num1]); ////
-            StackPop(&str->stk, ptr_reg(str, num1));
-            printf("\n");
-			pc += 2;
-            break;
+				break;
 
-        case c_sqrt:
-            StackPop(&str->stk, &num1);
-			StackPush(&str->stk, sqrt(num1));
-            printf("\n");
-			pc++;
-            break;
+			case cmd_rpush:
+				num1 = *((num_t*)buf + pc + 1);
+				StackPush(&str->stk, *ptr_reg(str, num1));
+				pc += 2;
 
-        case c_sin:
-            StackPop(&str->stk, &num1);
-			StackPush(&str->stk, sin(num1));
-            printf("\n");
-			pc++;
-            break;
+				#ifdef INFO
+				printf("Register from file: <%s>\n", REGISTER[(int)num1]);
+				#endif
 
-        case c_cos:
-            StackPop(&str->stk, &num1);
-			StackPush(&str->stk, cos(num1));
-            printf("\n");
-            pc++;
-			break;
+				break;	
 
-        case in:
-            printf("Введите число: ");
-            fscanf(stdin, NUM_MOD_SCAN, &num1);
-            printf("Numeric user: <" NUM_MOD_PRINT ">\n", num1); ////
+			case cmd_pop:
+				num1 = *((num_t*)buf + pc + 1);
+				StackPop(&str->stk, ptr_reg(str, num1));
+				pc += 2;
+				
+				#ifdef INFO
+				printf("Register from file: <%s>\n", REGISTER[(int)num1]); ////
+				#endif
+				
+				break;
 
-            StackPush(&str->stk, num1);
-            printf("\n");
-            pc++;
-			break;
+			case cmd_sqrt:
+				StackPop(&str->stk, &num1);
+				StackPush(&str->stk, sqrt(num1));
+				pc++;
+				printf("\n");
+				break;
 
-        case add:
-            StackPop(&str->stk, &num1);
-            StackPop(&str->stk, &num2);
+			case cmd_sin:
+				StackPop(&str->stk, &num1);
+				StackPush(&str->stk, sin(num1));
+				printf("\n");
+				pc++;
+				break;
 
-            StackPush(&str->stk, num1 + num2);
-            printf("\n");
-            pc++;
-			break;
+			case cmd_cos:
+				StackPop(&str->stk, &num1);
+				StackPush(&str->stk, cos(num1));
+				pc++;
+				break;
 
-        case sub:
-            StackPop(&str->stk, &num1);
-            StackPop(&str->stk, &num2);
+			case cmd_in:
+				printf("Введите число: ");
+				fscanf(stdin, NUM_MOD_SCAN, &num1);
 
-            StackPush(&str->stk, num2 - num1);
-            printf("\n");
-            pc++;
-			break;
+				StackPush(&str->stk, num1);
+				pc++;
+				
+				#ifdef INFO
+				printf("Numeric user: <" NUM_MOD_PRINT ">\n", num1); ////
+				#endif
+				
+				break;
 
-        case mul:
-            StackPop(&str->stk, &num1);
-            StackPop(&str->stk, &num2);
+			case cmd_add:
+				StackPop(&str->stk, &num1);
+				StackPop(&str->stk, &num2);
 
-            StackPush(&str->stk, num1 * num2);
-            printf("\n");
-            pc++;
-			break;
+				StackPush(&str->stk, num1 + num2);
+				pc++;
+				break;
 
-        case c_div:
-            StackPop(&str->stk, &num1);
-            StackPop(&str->stk, &num2);
+			case cmd_sub:
+				StackPop(&str->stk, &num1);
+				StackPop(&str->stk, &num2);
 
-            StackPush(&str->stk, num2 / num1);
-            printf("\n");
-            pc++;
-			break;
+				StackPush(&str->stk, num2 - num1);
+				pc++;
+				break;
 
-        case out:
-            StackPop(&str->stk, &num1);
-            printf("%sОтвет: [" NUM_MOD_PRINT "]%s\n", YELLOW, num1, RESET);
-            printf("\n");
-			pc++;
-            break;
+			case cmd_mul:
+				StackPop(&str->stk, &num1);
+				StackPop(&str->stk, &num2);
 
-        case hlt:
-			pc++;
-			free(buf);
-            return 0;
-			break;
-        
-		default:
-            break;
+				StackPush(&str->stk, num1 * num2);
+				pc++;
+				break;
+
+			case cmd_div:
+				StackPop(&str->stk, &num1);
+				StackPop(&str->stk, &num2);
+
+				StackPush(&str->stk, num2 / num1);
+				pc++;
+				break;
+
+			case cmd_jmp:
+				pc = (size_t)*((num_t*)buf + pc + 1);
+				break;
+			
+			case cmd_jb:
+				StackPop(&str->stk, &num1);
+				StackPop(&str->stk, &num2);
+				if (num2 < num1)
+					pc = (size_t)*((num_t*)buf + pc + 1);
+				else
+					pc += 2;
+				break;
+			
+			case cmd_jbe:
+				StackPop(&str->stk, &num1);
+				StackPop(&str->stk, &num2);
+				if (num2 <= num1)
+					pc = (size_t)*((num_t*)buf + pc + 1);
+				else
+					pc += 2;
+				break;
+			
+			case cmd_ja:
+				StackPop(&str->stk, &num1);
+				StackPop(&str->stk, &num2);
+				if (num2 > num1)
+					pc = (size_t)*((num_t*)buf + pc + 1);
+				else
+					pc += 2;
+				break;
+
+			case cmd_jae:
+				StackPop(&str->stk, &num1);
+				StackPop(&str->stk, &num2);
+				if (num2 >= num1)
+					pc = (size_t)*((num_t*)buf + pc + 1);
+				else
+					pc += 2;
+				break;
+			
+			case cmd_je:
+				StackPop(&str->stk, &num1);
+				StackPop(&str->stk, &num2);
+				if (llabs(num2 - num1) < EPSILON)
+					pc = (size_t)*((num_t*)buf + pc + 1);
+				else
+					pc += 2;
+				break;
+
+			case cmd_jne:
+				StackPop(&str->stk, &num1);
+				StackPop(&str->stk, &num2);
+				if (llabs(num2 - num1) > EPSILON)
+					pc = (size_t)*((num_t*)buf + pc + 1);
+				else
+					pc += 2;
+				break;
+			
+			case cmd_out:
+				StackPop(&str->stk, &num1);
+				printf("%sОтвет: [" NUM_MOD_PRINT "]%s\n", YELLOW, num1, RESET);
+				pc++;
+				break;
+
+			case cmd_hlt:
+				pc++;
+				free(buf);
+				return 0;
+				break;
+			
+			default:
+				break;
         }
+		printf("\n");
     }
 
 	free(buf);

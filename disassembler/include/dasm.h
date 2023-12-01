@@ -14,21 +14,8 @@ const int    ERROR             = 1;
 const char *NAME_SRC_DASM = "res_asm.txt" ;
 const char *NAME_RES_DASM = "res_dasm.txt";
 
-int write_file(FILE *fp_src, FILE *fp_res);
+int bite_code_in_text(FILE *fp_src, FILE *fp_res);
 
-enum REGISTER{
-	rax = 1,
-	rbx,
-	rcx,
-	rdx
-};
-
-const char* REGISTER[] = {
-	"VENOM",
-	"rax",
-	"rbx",
-	"rcx",
-	"rdx",
-};
+char *create_buf(FILE *fp_src, size_t *sz_file);
 
 #endif

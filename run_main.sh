@@ -1,3 +1,4 @@
+#!/bin/zsh
 
 CXXFLAGS="-D _DEBUG -ggdb3 -g -std=c++23 -O0 -Wall -Wextra -Weffc++ \
 -Waggressive-loop-optimizations -Wc++14-compat -Wmissing-declarations  \
@@ -20,4 +21,25 @@ integer-divide-by-zero,leak,nonnull-attribute,null,object-size,return,\
 returns-nonnull-attribute,shift,signed-integer-overflow,undefined,\
 unreachable,vla-bound,vptr"
 
-g++ $CXXFLAGS processor/src/main.cpp processor/src/processor.cpp -o main -lmystack
+g++ $1 $CXXFLAGS processor/src/main.cpp processor/src/processor.cpp -o main -lmystack
+
+FILE=main
+if [ ! -f "$FILE" ]; then
+    echo "ERROR: Don't compile processor/src/main.cpp and processor/src/processor.cpp"
+fi
+
+FILE=asm
+if test -f "$FILE"; then
+    ./asm
+else
+	g++ $1 $CXXFLAGS assembler/src/asm.cpp -o asm && ./asm
+fi
+
+FILE=res_asm.txt
+if test -f "$FILE"; then
+    ./main
+else
+	echo "ERROR: res_asm.txt don't search"
+fi
+
+rm asm
