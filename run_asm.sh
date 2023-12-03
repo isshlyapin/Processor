@@ -25,5 +25,5 @@ if ./asm
 then
 	echo ""
 else
-	g++ -DLOG $CXXFLAGS assembler/src/asm.cpp -o asm && ./asm
+	g++ $CXXFLAGS assembler/src/asm.cpp -o asm && ./asm
 fi
