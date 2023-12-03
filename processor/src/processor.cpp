@@ -59,7 +59,9 @@ char *create_buf(FILE *fp_src, size_t *sz_file)
 
 int process_commands(FILE *fp_src, Storage *str)
 {
+	#ifdef INFO
 	printf("\n___%sWORKING PROCESSOR%s___\n\n", GREEN, RESET);
+	#endif
 
 	int command = VENOM_NUM_COMMAND;
 
@@ -133,13 +135,11 @@ int process_commands(FILE *fp_src, Storage *str)
 				StackPop(&str->stk, &num1);
 				StackPush(&str->stk, sqrt(num1));
 				pc++;
-				printf("\n");
 				break;
 
 			case cmd_sin:
 				StackPop(&str->stk, &num1);
 				StackPush(&str->stk, sin(num1));
-				printf("\n");
 				pc++;
 				break;
 
@@ -267,8 +267,10 @@ int process_commands(FILE *fp_src, Storage *str)
 			default:
 				break;
         }
+		#ifdef INFO
 		printf("\n");
-    }
+		#endif
+	}
 
 	free(buf);
 	return 0;

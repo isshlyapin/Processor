@@ -1,4 +1,4 @@
-#!/bin/zsh
+
 
 CXXFLAGS="-D _DEBUG -ggdb3 -g -std=c++23 -O0 -Wall -Wextra -Weffc++ \
 -Waggressive-loop-optimizations -Wc++14-compat -Wmissing-declarations  \
@@ -23,7 +23,7 @@ unreachable,vla-bound,vptr"
 
 if ./asm
 then
-echo ""
+	echo ""
 else
-g++ $CXXFLAGS assembler/src/asm.cpp -o asm && ./asm
+	g++ -DLOG $CXXFLAGS assembler/src/asm.cpp -o asm && ./asm
 fi
