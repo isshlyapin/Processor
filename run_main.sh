@@ -1,5 +1,3 @@
-
-
 CXXFLAGS="-D _DEBUG -ggdb3 -g -std=c++23 -O0 -Wall -Wextra -Weffc++ \
 -Waggressive-loop-optimizations -Wc++14-compat -Wmissing-declarations  \
 -Wcast-align -Wcast-qual -Wchar-subscripts -Wconditionally-supported \
@@ -21,6 +19,19 @@ integer-divide-by-zero,leak,nonnull-attribute,null,object-size,return,\
 returns-nonnull-attribute,shift,signed-integer-overflow,undefined,\
 unreachable,vla-bound,vptr"
 
+FILE=asm
+if test -f "$FILE"; then
+    ./asm
+else
+	g++ $1 $2 $CXXFLAGS assembler/src/asm.cpp -o asm && ./asm
+fi
+
+FILE=res_asm.txt
+if [ ! -f "$FILE" ]; then
+	echo "ERROR: res_asm.txt don't search"
+    exit 1
+fi
+
 if [ "$1" = "-DINFO" ]; then
 	g++ $1 $CXXFLAGS processor/src/*.cpp -o main -lmystack_with_info
 else
@@ -30,22 +41,8 @@ fi
 FILE=main
 if [ ! -f "$FILE" ]; then
     echo "ERROR: Don't compile processor/src/main.cpp and processor/src/processor.cpp"
-fi
-
-if [ "$2" = "-DLOG" ]; then
-	./asm_with_log || g++ $1 $2 $CXXFLAGS assembler/src/asm.cpp -o asm_with_log &&./asm_with_log
-fi
-
-FILE=asm
-if test -f "$FILE"; then
-    ./asm
+	exit 1
 else
-	g++ $1 $CXXFLAGS assembler/src/asm.cpp -o asm && ./asm
+	./main
 fi
 
-FILE=res_asm.txt
-if test -f "$FILE"; then
-    ./main
-else
-	echo "ERROR: res_asm.txt don't search"
-fi

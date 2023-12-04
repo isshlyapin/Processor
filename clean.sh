@@ -1,5 +1,3 @@
-
-
 rm asm
 rm dasm
 rm main

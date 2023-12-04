@@ -11,5 +11,5 @@ push 1
 add
 pop rax
 push rdx
-push 900
-jne 4
+push 225
+jne 11

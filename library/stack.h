@@ -30,34 +30,34 @@ typedef unsigned long long HASH_TYPE;
 
 enum code_error
 {
-	STACK_OK,
-	STACK_ERR,
-	STACK_DATA_ERR,
-	STACK_SIZE_ERR,
-	STACK_CAPACITY_ERR,
+    STACK_OK,
+    STACK_ERR,
+    STACK_DATA_ERR,
+    STACK_SIZE_ERR,
+    STACK_CAPACITY_ERR,
 #ifdef DEBUG_CHECK
-	STACK_HASH_ERR,
-	STACK_CANARY_ERR,
-	STACK_LEFT_CANARY_ERR,
-	STACK_RIGHT_CANARY_ERR,
-	STACK_DATA_CANARY_ERR,
-	STACK_DATA_canary_str_l_ERR,
-	STACK_DATA_canary_str_r_ERR,
+    STACK_HASH_ERR,
+    STACK_CANARY_ERR,
+    STACK_LEFT_CANARY_ERR,
+    STACK_RIGHT_CANARY_ERR,
+    STACK_DATA_CANARY_ERR,
+    STACK_DATA_canary_str_l_ERR,
+    STACK_DATA_canary_str_r_ERR,
 #endif
 };
 
 struct Stack
 {
 #ifdef DEBUG_CHECK
-	CANARY_T canary_str_l;
+    CANARY_T canary_str_l;
 #endif
-	size_t size;
-	ELEM_T *data;
-	size_t capacity;
+    size_t size;
+    ELEM_T *data;
+    size_t capacity;
 #ifdef DEBUG_CHECK
-	const CANARY_T STACK_VALUE_DEFAULT = 0;
-	HASH_TYPE hash = STACK_VALUE_DEFAULT;
-	CANARY_T canary_str_r;
+    const CANARY_T STACK_VALUE_DEFAULT = 0;
+    HASH_TYPE hash = STACK_VALUE_DEFAULT;
+    CANARY_T canary_str_r;
 #endif
 };
 
@@ -90,13 +90,13 @@ HASH_TYPE hash_crc_32 (char *message);
 
 #define ASSERT_STACK(stack)                                          \
 {                                                                    \
-	int *code_err = stack_verification(stack, __func__);             \
-	if (code_err[0] != STACK_OK)                                     \
-	{                                                                \
-		stack_dump(stack, code_err, __FILE__, __func__, __LINE__);   \
-		return code_err[0];                                          \
-	}                                                                \
-	free(code_err);                                                  \
+    int *code_err = stack_verification(stack, __func__);             \
+    if (code_err[0] != STACK_OK)                                     \
+    {                                                                \
+        stack_dump(stack, code_err, __FILE__, __func__, __LINE__);   \
+        return code_err[0];                                          \
+    }                                                                \
+    free(code_err);                                                  \
 }         
 
 #endif

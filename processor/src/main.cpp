@@ -5,14 +5,13 @@ const char *NAME_SRC_PROC = "res_asm.txt";
 
 int main()
 {
-	Storage str = {};
-	StorageCtor(&str);
+    Storage str = {};
+    StorageCtor(&str);
 
     FILE *fp_src = fopen(NAME_SRC_PROC, "rb");
 
-	process_commands(fp_src, &str);
+    process_commands(fp_src, &str);
 
-	// STORAGE_DUMP(&str);
-	StorageDtor(&str);
-	fclose(fp_src);
+    StorageDtor(&str);
+    fclose(fp_src);
 }
