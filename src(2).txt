@@ -1,4 +1,4 @@
-push 1
+push 10
 pop rax
 push rax
 push rax
@@ -9,6 +9,7 @@ out
 push rax
 push 1
 add
+org 100
 pop rax
 push rdx
 push 225

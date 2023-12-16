@@ -1,0 +1,22 @@
+push 10
+call 100
+push rax
+out
+hlt
+org 100
+pop rax
+push rax
+push rax
+push 1
+je 200
+push rax
+push 1
+sub
+call 100
+push rax
+mul
+pop rax
+ret
+org 200
+pop rax
+ret

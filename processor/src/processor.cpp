@@ -23,16 +23,17 @@ int process_commands(FILE *fp_src, Storage *str)
 
         PRINTF_INFO_CMD();
         
-        num_t num1  = VENOM_ELEM;
-        num_t num2  = VENOM_ELEM;
-        char id_reg = -13;
-        int  id_jmp = 0;
+        num_t  num1   = VENOM_ELEM;
+        num_t  num2   = VENOM_ELEM;
+        char   id_reg = -13;
+        int    id_jmp = 0;
+        ELEM_T id_ret = 0;
 
         switch (num_command)
         {
             case cmd_push:
                 memcpy(&num1, array_cmd_and_prm + pc + 1, sizeof(num_t));
-                StackPush(&str->stk, num1); 
+                StackPush(&str->stk_cmd, num1); 
                 pc += 1 + sizeof(num_t);
 
                 PRINT_INFO("Numeric from file: <%.2lf>\n", num1);
@@ -40,7 +41,7 @@ int process_commands(FILE *fp_src, Storage *str)
 
             case cmd_rpush:
                 id_reg = array_cmd_and_prm[pc+1];				
-                StackPush(&str->stk, *ptr_reg(str, (int)id_reg));
+                StackPush(&str->stk_cmd, *ptr_reg(str, (int)id_reg));
                 pc += 2;
 
                 PRINT_INFO("Register from file: <%s>\n", REGISTER[(int)id_reg]);
@@ -48,7 +49,7 @@ int process_commands(FILE *fp_src, Storage *str)
 
             case cmd_pop:
                 id_reg = array_cmd_and_prm[pc+1];				
-                StackPop(&str->stk, ptr_reg(str, (int)id_reg));
+                StackPop(&str->stk_cmd, ptr_reg(str, (int)id_reg));
                 pc += 2;
                 
                 PRINT_INFO("Register from file: <%s>\n", REGISTER[(int)id_reg]);				
@@ -124,6 +125,17 @@ int process_commands(FILE *fp_src, Storage *str)
             case cmd_jne:
                 JMP_IF(fabs(num2 - num1) > EPSILON, num1, num2);
                 break;
+
+            case cmd_call:
+                memcpy(&id_jmp, array_cmd_and_prm + pc + 1, sizeof(int));
+                StackPush(&str->stk_ptr, (ELEM_T)pc + 1 + sizeof(int));
+                pc = (size_t)id_jmp;
+                break;
+
+            case cmd_ret:
+                StackPop(&str->stk_ptr, &id_ret);
+                pc = (size_t)id_ret;
+                break;
             
             case cmd_out:
                 CMD_OUT(num1);
@@ -148,7 +160,8 @@ int process_commands(FILE *fp_src, Storage *str)
 
 int StorageCtor(Storage *str)                        
 {
-    StackCtor(&str->stk, std_stack_cap);
+    StackCtor(&str->stk_cmd, std_stack_cap);
+    StackCtor(&str->stk_ptr, std_stack_cap);
     str->rax = VENOM_ELEM;
     str->rbx = VENOM_ELEM;
     str->rcx = VENOM_ELEM;
@@ -159,7 +172,8 @@ int StorageCtor(Storage *str)
 
 int StorageDtor(Storage *str)
 {
-    StackDtor(&str->stk);
+    StackDtor(&str->stk_cmd);
+    StackDtor(&str->stk_ptr);
     str->rax  = VENOM_ELEM;
     str->rbx  = VENOM_ELEM;
     str->rcx  = VENOM_ELEM;
@@ -177,7 +191,8 @@ int StorageDump(Storage *str, const char *file_err, const char *func_err, const 
     fprintf(stderr, "Register [bx] = " ELEM_MOD "\n", str->rbx);
     fprintf(stderr, "Register [cx] = " ELEM_MOD "\n", str->rcx);
     fprintf(stderr, "Register [dx] = " ELEM_MOD "\n", str->rdx);
-    STACK_DUMP(&str->stk);
+    STACK_DUMP(&str->stk_cmd);
+    STACK_DUMP(&str->stk_ptr);
     return 0;
 }
 

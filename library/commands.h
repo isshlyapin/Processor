@@ -21,7 +21,10 @@ enum COMMANDS
     cmd_jae,
     cmd_je,
     cmd_jne,
-    cmd_rpush,
+    cmd_call,
+    cmd_ret,
+    dir_org,
+    cmd_rpush
 };
 
 const char *commands[] = {
@@ -44,7 +47,10 @@ const char *commands[] = {
     "jae",    // 16
     "je",     // 17
     "jne",    // 18
-    "hlt",    // 19 
+    "call",   // 19
+    "ret",    // 20
+    "org",    // 21
+    "hlt",    // 22 
 };  
 
 const size_t NUMBER_INSTRUCTIONS = sizeof(commands) / sizeof(commands[0]) - 1;
