@@ -61,7 +61,14 @@ int create_bite_code(FILE *fp_src, FILE *fp_res)
             fprintf(stderr, "ERROR: Don't read name command\n");
             return ERROR;
         }
-        src_pc += ncr;
+        if (strcmp(name_cmd, "#") == 0)
+        {
+            while(src.src_arr[src_pc] != '\n')
+                src_pc++;
+            continue;
+        }
+        else
+            src_pc += ncr;
 
         for (size_t j = 1; j <= NUMBER_INSTRUCTIONS; j++)
         {
@@ -256,9 +263,19 @@ size_t calc_sz_res_arr(FILE *fp_src, src_data *file_data)
             fprintf(stderr, "ERROR: Don't read name command\n");
             return ERROR;
         }
-        i += ncr;
+
+        if (strcmp(name_cmd, "#") == 0)
+        {
+            while (array[i] != '\n')
+                i++;
+            continue;
+        }
+        else
+            i += ncr;
                 
         bool check_command = false;
+        
+
         for (size_t j = 1; j <= NUMBER_INSTRUCTIONS; j++)
         {
             if (strcmp(name_cmd, commands[j]) == 0)

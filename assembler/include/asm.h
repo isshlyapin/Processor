@@ -10,13 +10,13 @@
 const int ERROR_REG = 777;
 const int ERROR     = 1;
 
-const char *NAME_SRC_ASM = "src(3).txt"  ; 
+const char *NAME_SRC_ASM = "src-factorial.txt"  ; 
 const char *NAME_RES_ASM = "res_asm.txt" ; 
 const char *NAME_LOG_ASM = "log_file.txt";
 
-const size_t max_size_c        = 100;
+const size_t max_size_c    = 100;
 const num_t  VENOM_NUM_CMD = -13;
-const int    len_name_reg   = 3;
+const int    len_name_reg  = 3;
 
 typedef struct{
     char   *src_arr;
