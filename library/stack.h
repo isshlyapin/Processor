@@ -7,9 +7,9 @@
 #include <assert.h>
 
 #ifdef DEBUG_CHECK
-const int ERROR_CNT = 13;
+    const int ERROR_CNT = 13;
 #else
-const int ERROR_CNT = 6;
+    const int ERROR_CNT = 6;
 #endif
 
 const double VENOM_ELEM = -13;
@@ -22,10 +22,10 @@ const size_t REALLOC_DECREASE_CHECK = 4;
 typedef double ELEM_T;
 
 #ifdef DEBUG_CHECK
-const unsigned long long CANARY = 0xab0baab0baab0ba;
-const unsigned long long CANARY_STR = 0xdeaddeaddeaddead;
-typedef unsigned long long CANARY_T;
-typedef unsigned long long HASH_TYPE;
+    const unsigned long long CANARY = 0xab0baab0baab0ba;
+    const unsigned long long CANARY_STR = 0xdeaddeaddeaddead;
+    typedef unsigned long long CANARY_T;
+    typedef unsigned long long HASH_TYPE;
 #endif
 
 enum code_error

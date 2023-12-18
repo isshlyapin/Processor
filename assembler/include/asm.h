@@ -7,44 +7,46 @@
 
 #include "../../library/config.h"
 
-const int ERROR_REG = 777;
-const int ERROR     = 1;
-
-const char *NAME_SRC_ASM = "src-factorial.txt"  ; 
-const char *NAME_RES_ASM = "res_asm.txt" ; 
-const char *NAME_LOG_ASM = "log_file.txt";
-
-const size_t max_size_c    = 100;
+const size_t MAX_SIZE_STR  = 100;
 const num_t  VENOM_NUM_CMD = -13;
-const int    len_name_reg  = 3;
+const int    LEN_NAME_REG  = 3;
 
-typedef struct{
-    char   *src_arr;
-    size_t sz_src_file;
-} src_data;
-
-#define CHECK_OPEN_FILE(file_ptr)                        \
-if (file_ptr == NULL)                                    \
-{                                                        \
-    fprintf(stderr, "ERROR: Don't open source file\n");  \
-    return ERROR;                                        \
-}
+struct Array{
+    char   *arr_ptr;
+    size_t size_arr;
+};
 
 int check_num_reg(const char *str);
 
-int create_bite_code(FILE *fp_src, FILE *fp_res);
+int create_byte_code(FILE *fp_src, FILE *fp_res);
 
-int ctor_src_arr(FILE *fp_src, src_data *file_data);
+int ctor_src_arr(FILE *fp_src, struct Array *file_data);
 
-size_t calc_sz_res_arr(FILE *fp_src, src_data *file_data);
+size_t calc_sz_res_arr(FILE *fp_src, struct Array *file_data);
+
+int command_process(const char *name_cmd, int* num_cmd);
 
 size_t search_size_file(FILE *fp_src);
 
+#define NUM_CMD_EQUALS_JMP_OR_CALL(num_cmd) ((num_cmd >= cmd_jmp) && (num_cmd <= cmd_jne)) || (num_cmd == cmd_call)
+#define ORG_NOT_CORRECT(org_id, current_pc) ((size_t)org_id < current_pc) || (org_id < 0)
+#define COMMENT_PROCESS(array, src_pc, ncr)   \
+    if (strcmp(name_cmd, "#") == 0)           \
+    {                                         \
+        while(array[src_pc] != '\n')          \
+            src_pc++;                         \
+        src_pc++;                             \
+        continue;                             \
+    }                                         \
+    else                                      \
+        src_pc += ncr; 
+
 #ifdef LOG
     FILE *fp_log = NULL;
-    #define OPEN_LOG_FIlE()                                     \
-    fp_log = fopen(NAME_LOG_ASM, "a");                          \
-    CHECK_OPEN_FILE(fp_log);
+
+    #define OPEN_LOG_FIlE()              \
+        fp_log = fopen(argv[3], "a");    \
+        CHECK_OPEN_FILE(fp_log);
 
     #define CLOSE_LOG_FILE() fclose(fp_log) 
     #define PRINT_LOG(str ...) fprintf(fp_log, str)

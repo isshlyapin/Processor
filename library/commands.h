@@ -1,34 +1,37 @@
+#ifndef COMMANDS_H
+#define COMMANDS_H 
+
 #include <stdio.h>
 
 enum COMMANDS
 {
-    cmd_hlt = -1,
-    cmd_push = 1,
-    cmd_sqrt,
-    cmd_sin,
-    cmd_cos,
-    cmd_in,
-    cmd_add,
-    cmd_sub,
-    cmd_mul,
-    cmd_div,
-    cmd_out,
-    cmd_pop,
-    cmd_jmp,
-    cmd_jb,
-    cmd_jbe,
-    cmd_ja,
-    cmd_jae,
-    cmd_je,
-    cmd_jne,
-    cmd_call,
-    cmd_ret,
-    dir_org,
-    cmd_rpush
+    cmd_hlt   = 0,
+    cmd_push  = 1,
+    cmd_sqrt  = 2,
+    cmd_sin   = 3,
+    cmd_cos   = 4,
+    cmd_in    = 5,
+    cmd_add   = 6,
+    cmd_sub   = 7,
+    cmd_mul   = 8,
+    cmd_div   = 9,
+    cmd_out   = 10,
+    cmd_pop   = 11,
+    cmd_jmp   = 12,
+    cmd_jb    = 13,
+    cmd_jbe   = 14,
+    cmd_ja    = 15,
+    cmd_jae   = 16,
+    cmd_je    = 17,
+    cmd_jne   = 18,
+    cmd_call  = 19,
+    cmd_ret   = 20,
+    dir_org   = 21,
+    cmd_rpush = 22
 };
 
-const char *commands[] = {
-    "VENOM",  // 0
+static const char *commands[] = {
+    "hlt",    // 0
     "push",   // 1
     "c_sqrt", // 2
     "c_sin",  // 3
@@ -49,24 +52,23 @@ const char *commands[] = {
     "jne",    // 18
     "call",   // 19
     "ret",    // 20
-    "org",    // 21
-    "hlt",    // 22 
+    "org"     // 21
 };  
 
-const size_t NUMBER_INSTRUCTIONS = sizeof(commands) / sizeof(commands[0]) - 1;
+static const size_t NUMBER_INSTRUCTIONS = sizeof(commands) / sizeof(commands[0]);
 
 enum REGISTER{
-    rax = 1,
-    rbx,
-    rcx,
-    rdx 
+    rax = 0,
+    rbx = 1,
+    rcx = 2,
+    rdx = 3 
 };
 
-
-const char* REGISTER[] = {
-    "VENOM",
+static const char* REGISTER[] = {
     "rax",
     "rbx",
     "rcx",
     "rdx",
 };
+
+#endif

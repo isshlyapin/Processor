@@ -3,7 +3,7 @@
 
 #include <stdio.h>
 
-const size_t std_stack_cap = 10;
+static const size_t STD_STACK_CAP = 10;
 
 typedef double num_t;
 

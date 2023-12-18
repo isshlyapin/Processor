@@ -19,11 +19,18 @@ integer-divide-by-zero,leak,nonnull-attribute,null,object-size,return,\
 returns-nonnull-attribute,shift,signed-integer-overflow,undefined,\
 unreachable,vla-bound,vptr"
 
+ASM_START_FILE="src-factorial.txt res_asm.txt log_file.txt"
+PROC_START_FILE="res_asm.txt"
+
+if [ "$3" != "FLAGS" ]; then
+    CXXFLAGS=""
+fi
+
 FILE=asm
 if test -f "$FILE"; then
-    ./asm
+    ./asm $ASM_START_FILE
 else
-	g++ $1 $2 $CXXFLAGS assembler/src/asm.cpp -o asm && ./asm
+	g++ $1 $2 $CXXFLAGS assembler/src/asm.cpp -o asm && ./asm $ASM_START_FILE
 fi
 
 FILE=res_asm.txt
@@ -43,6 +50,6 @@ if [ ! -f "$FILE" ]; then
     echo "ERROR: Don't compile processor/src/main.cpp and processor/src/processor.cpp"
 	exit 1
 else
-	./main
+	./main $PROC_START_FILE 
 fi
 

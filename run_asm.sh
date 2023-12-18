@@ -19,9 +19,10 @@ integer-divide-by-zero,leak,nonnull-attribute,null,object-size,return,\
 returns-nonnull-attribute,shift,signed-integer-overflow,undefined,\
 unreachable,vla-bound,vptr"
 
-if ./asm
-then
-	echo ""
+FILE=asm
+if test -f "$FILE"; then
+    ./asm "src-factorial.txt" "res_asm.txt" "log_file.txt"
 else
-	g++ -DINFO -DLOG $CXXFLAGS assembler/src/asm.cpp -o asm && ./asm
+    g++ "-DINFO" "-DLOG" $CXXFLAGS assembler/src/asm.cpp -o asm && ./asm "src-factorial.txt" "res_asm.txt" "log_file.txt"
 fi
+
