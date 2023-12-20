@@ -1,3 +1,4 @@
+#include <cstdio>
 #include <stdlib.h>
 
 #include "../include/asm.h"
@@ -9,8 +10,10 @@ int main(int argc, char *argv[])
 {
     PRINT_INFO("\n___%sWORKING ASSEMBLER%s___\n\n", RED, RESET);
 
-    OPEN_LOG_FIlE();
+    char test_ch = 2;
+    printf("<%d><%c>\n", test_ch, (test_ch | 130));
 
+    OPEN_LOG_FIlE();
     FILE *fp_src = fopen(argv[1], "r");
     CHECK_OPEN_FILE(fp_src);   
 
@@ -31,14 +34,13 @@ int create_byte_code(FILE *fp_src, FILE *fp_res)
     assert(fp_src != NULL);
 
     PRINT_LOG("\n\n\n---NEW_LOG_INFORMATION---\n");
-
+    
     struct Array src_arr = {NULL, 0};
 
     ctor_src_arr(fp_src, &src_arr);
 
-
     size_t sz_res_arr = calc_sz_res_arr(fp_src, &src_arr);
-    char   *res_arr   = (char*)calloc(sz_res_arr + 1, sizeof(char));
+    char *res_arr   = (char*)calloc(sz_res_arr + 1, sizeof(char));
 
     PRINT_LOG("Size source file: %lu\n", sz_res_arr);
     PRINT_LOG("Pointer array commands and parameters: %p\n\n", res_arr);
@@ -51,16 +53,17 @@ int create_byte_code(FILE *fp_src, FILE *fp_res)
 
     while (pc < sz_res_arr)
     {
-        int ncr = 0;  //ncr - number of characters read
+        int ncr = 0;  // ncr - number of characters read
         
-        if (sscanf(src_arr.arr_ptr + src_pc, "%s %n", name_cmd, &ncr) != 1)
+        bool read_cmd = sscanf(src_arr.arr_ptr + src_pc, "%s %n", name_cmd, &ncr);
+        if (!read_cmd)
         {
             fprintf(stderr, "%s\n", ERROR_TEXT[ERROR_READ_CMD]);
             return ERROR_READ_CMD;
         }
-        
-        COMMENT_PROCESS(src_arr.arr_ptr, src_pc, ncr);
 
+        COMMENT_PROCESS(src_arr.arr_ptr, src_pc, ncr);
+        
         if (command_process(name_cmd, &num_cmd) == ERROR_NAME_CMD)
             return ERROR_NAME_CMD;
              
@@ -84,7 +87,7 @@ int create_byte_code(FILE *fp_src, FILE *fp_res)
             else
             {
                 sscanf (src_arr.arr_ptr + src_pc, "%s \n%n", name_cmd, &ncr);
-                res_arr[pc]   = (char)cmd_rpush;
+                res_arr[pc]   = 53;
                 res_arr[pc+1] = (char)check_num_reg(name_cmd);
                 
                 if (res_arr[pc+1] == ERROR_REG_NAME)
@@ -151,7 +154,7 @@ int create_byte_code(FILE *fp_src, FILE *fp_res)
 
     res_arr[sz_res_arr] = (char)cmd_hlt;
     
-    PRINT_LOG("NAME_CMD <%-7s> NUM_CMD <%-2d> " , commands[cmd_hlt], cmd_hlt);
+    PRINT_LOG("NAME_CMD <%-7s> NUM_CMD <%-2d> " , commands[cmd_hlt] + 4, cmd_hlt);
     PRINT_LOG("PRM<%-9s> CMD_ID <%lu>\n", "---", sz_res_arr);
 
     PRINT_INFO("name_cmd: %s[%4s]%s", RED, "hlt", RESET);
@@ -169,15 +172,23 @@ int command_process(const char *name_cmd, int* num_cmd)
 {
     bool check_command = false;
 
-    for (size_t j = 0; j <= NUMBER_INSTRUCTIONS; j++)
-    {
-        if (strcmp(name_cmd, commands[j]) == 0)
-        {
-            *num_cmd      = (int)j; 
-            check_command = true;
-            break;
-        }
-    }
+    #define NEW_INSTRUCTIONS(name, num, ...)    \
+        if (strcmp(name_cmd, #name + 4) == 0)   \
+        {                                       \
+            *num_cmd      = num;                \
+            check_command = true;               \
+        }                    
+
+    #define NEW_DIRECTIVE(name, num, ...)       \
+        if (strcmp(name_cmd, #name + 4) == 0)   \
+        {                                       \
+            *num_cmd      = num;                \
+            check_command = true;               \
+        }                    
+
+    #include "../../library/test-def-cmd.txt"
+    #undef NEW_INSTRUCTIONS
+    #undef NEW_DIRECTIVE
 
     if (!check_command)
     {

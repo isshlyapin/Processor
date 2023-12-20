@@ -29,7 +29,9 @@ int command_process(const char *name_cmd, int* num_cmd);
 size_t search_size_file(FILE *fp_src);
 
 #define NUM_CMD_EQUALS_JMP_OR_CALL(num_cmd) ((num_cmd >= cmd_jmp) && (num_cmd <= cmd_jne)) || (num_cmd == cmd_call)
+
 #define ORG_NOT_CORRECT(org_id, current_pc) ((size_t)org_id < current_pc) || (org_id < 0)
+
 #define COMMENT_PROCESS(array, src_pc, ncr)   \
     if (strcmp(name_cmd, "#") == 0)           \
     {                                         \

@@ -14,3 +14,4 @@ int main(int argc, char *argv[])
     StorageDtor(&str);
     fclose(fp_src);
 }
+
