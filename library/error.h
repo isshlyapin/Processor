@@ -31,4 +31,11 @@ static const char *ERROR_TEXT[] = {
         return ERROR;                                        \
     }
 
+#define CHECK_ARGC(num, right_num)                                                   \
+    if (num < right_num)                                                             \
+    {                                                                                \
+        fprintf(stderr, "Недостаточное количество аргументов командной строки\n");   \
+        return ERROR;                                                                \
+    }
+    
 #endif

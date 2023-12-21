@@ -21,34 +21,19 @@ struct Label {
     int jmp_id;
 };
 
-int check_num_reg(const char *str);
-
 int create_byte_code(FILE *fp_src, FILE *fp_res);
+
+int assembly(struct Array *src_struct_arr, struct Array *res_struct_arr, struct Label *arr_lab, int pass_num);
 
 struct Array *ctor_struct_arr(FILE *fp_src);
 
-// size_t calc_sz_res_arr(FILE *fp_src, struct Array *file_data);
-
-// int command_process(const char *name_cmd, int* num_cmd);
-
 size_t search_size_file(FILE *fp_src);
 
-int assembly(struct Array *src_struct_arr, struct Array *res_struct_arr, struct Label *arr_lab, int pass_num);
+int check_num_reg(const char *str);
 
 #define NUM_CMD_EQUALS_JMP_OR_CALL(num_cmd) ((num_cmd >= cmd_jmp) && (num_cmd <= cmd_jne)) || (num_cmd == cmd_call)
 
 #define ORG_NOT_CORRECT(org_id, current_pc) ((size_t)org_id < current_pc) || (org_id < 0)
-
-#define COMMENT_PROCESS(array, src_pc, ncr)   \
-    if (strcmp(name_cmd, "#") == 0)           \
-    {                                         \
-        while(array[src_pc] != '\n')          \
-            src_pc++;                         \
-        src_pc++;                             \
-        continue;                             \
-    }                                         \
-    else                                      \
-        src_pc += ncr; 
 
 #ifdef LOG
     FILE *fp_log = NULL;

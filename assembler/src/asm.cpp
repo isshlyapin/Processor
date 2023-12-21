@@ -8,12 +8,17 @@
 
 int main(int argc, char *argv[])
 {
+
+    #ifdef LOG
+        CHECK_ARGC(argc, 3);
+    #else
+        CHECK_ARGC(argc, 2);
+    #endif
+
     PRINT_INFO("\n___%sWORKING ASSEMBLER%s___\n\n", RED, RESET);
 
-    char test_ch = 2;
-    printf("<%d><%c>\n", test_ch, (test_ch | 130));
-
     OPEN_LOG_FIlE();
+
     FILE *fp_src = fopen(argv[1], "r");
     CHECK_OPEN_FILE(fp_src);   
 
@@ -38,11 +43,11 @@ int create_byte_code(FILE *fp_src, FILE *fp_res)
     struct Array *src_struct_arr = ctor_struct_arr(fp_src);
     assert(src_struct_arr != NULL);
 
-    struct Label *arr_label = (struct Label*)calloc(100, sizeof(struct Label));
-    assert(arr_label != NULL);
-
     struct Array *res_struct_arr = (struct Array*)calloc(1, sizeof(struct Array));
     assert(res_struct_arr != NULL);
+
+    struct Label *arr_label = (struct Label*)calloc(100, sizeof(struct Label));
+    assert(arr_label != NULL);
 
     assembly(src_struct_arr, res_struct_arr, arr_label, 1);
     assembly(src_struct_arr, res_struct_arr, arr_label, 2);
@@ -64,6 +69,7 @@ int create_byte_code(FILE *fp_src, FILE *fp_res)
     free(res_struct_arr);
 
     free(arr_label);
+
     return WITHOUT_ERROR;
 }
 
@@ -71,10 +77,9 @@ struct Array *ctor_struct_arr(FILE *fp_src)
 {
     struct Array *new_struct_arr = (struct Array*)malloc(sizeof(struct Array));
 
-    long start_ptr_file = ftell(fp_src);
-
-    size_t sz_file = search_size_file(fp_src);
-    char   *array  = (char*)calloc(sz_file + 1, sizeof(char));
+    long   start_ptr_file = ftell(fp_src);
+    size_t sz_file        = search_size_file(fp_src);
+    char   *array         = (char*)calloc(sz_file + 1, sizeof(char));
 
     fread(array, sizeof(char), sz_file, fp_src);
 
@@ -82,7 +87,6 @@ struct Array *ctor_struct_arr(FILE *fp_src)
     new_struct_arr->size_arr = sz_file;
     
     fseek(fp_src, start_ptr_file, SEEK_SET);
-    
     return new_struct_arr;
 }
 
@@ -91,13 +95,11 @@ size_t search_size_file(FILE *fp_src)
     assert(fp_src != NULL);
 
 	long start_ftell = ftell(fp_src);
-    
     fseek(fp_src, 0, SEEK_END);
     
     size_t size_file = (size_t)ftell(fp_src);
-    
     fseek(fp_src, start_ftell, SEEK_SET);
-    
+
     return size_file;
 }
 
@@ -110,16 +112,17 @@ int assembly(struct Array *src_struct_arr, struct Array *res_struct_arr, struct 
             ASM_DEF(pass_num, num);                      \
         }                   
 
+    char *src_arr_ptr = src_struct_arr->arr_ptr;
+    char *res_arr_ptr = res_struct_arr->arr_ptr;
+
     size_t sz_res_arr = res_struct_arr->size_arr;
+    
     int    index_lab  = 1;
 
     size_t pc     = 0;
     size_t src_pc = 0;
 
     num_t num_user = 0;
-
-    char *src_arr_ptr = src_struct_arr->arr_ptr;
-    char *res_arr_ptr = res_struct_arr->arr_ptr;
 
     while (src_pc < src_struct_arr->size_arr)
     {
@@ -149,11 +152,8 @@ int assembly(struct Array *src_struct_arr, struct Array *res_struct_arr, struct 
             if (pass_num == 1)
             {
                 arr_lab[0].jmp_id++;
-                printf("количество меток = %d\n", arr_lab[0].jmp_id);
 
                 arr_lab[index_lab].jmp_id = (int)sz_res_arr;
-                printf("имя метки = %s\n", name_cmd + 1);
-                printf("адрес по метке = %d\n", arr_lab[index_lab].jmp_id);             
                 strncpy(arr_lab[index_lab].name_lab, name_cmd + 1, MAX_SIZE_STR - 1);
                 index_lab++;
             }
