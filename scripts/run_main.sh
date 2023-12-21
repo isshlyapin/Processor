@@ -12,15 +12,20 @@ CXXFLAGS="-D _DEBUG -ggdb3 -g -std=c++23 -O0 -Wall -Wextra -Weffc++ \
 -Wno-literal-suffix -Wno-missing-field-initializers -Wno-narrowing \
 -Wno-old-style-cast -Wno-varargs -Wstack-protector -fcheck-new \
 -fsized-deallocation -fstack-protector -fstrict-overflow \
--flto-odr-type-merging -fno-omit-frame-pointer -Wlarger-than=16384 \
+-flto-odr-type-merging -fno-omit-frame-pointer -Wlarger-than=32768 \
 -Wstack-usage=8192 -fPIE -Werror=vla -fsanitize=address,\
 alignment,bool,bounds,enum,float-cast-overflow,float-divide-by-zero,\
 integer-divide-by-zero,leak,nonnull-attribute,null,object-size,return,\
 returns-nonnull-attribute,shift,signed-integer-overflow,undefined,\
 unreachable,vla-bound,vptr"
 
-ASM_START_FILE="src-factorial.txt res_asm.txt log_file.txt"
-PROC_START_FILE="res_asm.txt"
+ASM_START_FILE="program-txt/src/src-factorial-with_org.txt program-txt/res/res_asm.txt log/log_file.txt"
+PROC_START_FILE="program-txt/res/res_asm.txt"
+
+PATH_ASM_SRC="assembler/src/asm.cpp"
+PATH_ASM_BIN="bin/asm"
+
+cd ~/GIT/processor
 
 if [ "$3" != "FLAGS" ]; then
     CXXFLAGS=""
@@ -28,28 +33,28 @@ fi
 
 FILE=asm
 if test -f "$FILE"; then
-    ./asm $ASM_START_FILE
+    bin/asm $ASM_START_FILE
 else
-	g++ $1 $2 $CXXFLAGS assembler/src/asm.cpp -o asm && ./asm $ASM_START_FILE
+	g++ $1 $2 $CXXFLAGS $PATH_ASM_SRC -o bin/asm && bin/asm $ASM_START_FILE
 fi
 
-FILE=res_asm.txt
+FILE=program-txt/res/res_asm.txt
 if [ ! -f "$FILE" ]; then
-	echo "ERROR: res_asm.txt don't search"
+	echo "Ошибка: Файл res_asm.txt не найден"
     exit 1
 fi
 
 if [ "$1" = "-DINFO" ]; then
-	g++ $1 $CXXFLAGS processor/src/*.cpp -o main -lmystack_with_info
+	g++ $1 $CXXFLAGS processor/src/*.cpp -o bin/main -lmystack_with_info
 else
-	g++ $1 $CXXFLAGS processor/src/*.cpp -o main -lmystack_without_info
+	g++ $1 $CXXFLAGS processor/src/*.cpp -o bin/main -lmystack_without_info
 fi
 
-FILE=main
+FILE=bin/main
 if [ ! -f "$FILE" ]; then
-    echo "ERROR: Don't compile processor/src/main.cpp and processor/src/processor.cpp"
+    echo "Ошибка: Файлы main.cpp и processor.cpp не были скомпилированы"
 	exit 1
 else
-	./main $PROC_START_FILE 
+	bin/main $PROC_START_FILE 
 fi
 

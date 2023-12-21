@@ -1,7 +1,6 @@
-rm asm
-rm dasm
-rm main
-rm res_asm.txt
-rm res_dasm.txt
-rm asm_with_log
-rm log_file.txt
+cd ~/GIT/processor
+
+rm bin/*
+rm program-txt/res/*
+
+# rm log/*

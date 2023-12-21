@@ -14,7 +14,7 @@ unreachable,vla-bound,vptr"
 
 ASM_START_FILE="program-txt/src/src-factorial-with_label.txt program-txt/res/res_asm.txt log/log_file.txt"
 
-cd ..
+cd ~/GIT/processor/
 
 g++ "-DINFO" "-DLOG" $CXXFLAGS assembler/src/asm.cpp -o bin/asm 
 bin/asm $ASM_START_FILE

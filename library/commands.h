@@ -3,12 +3,10 @@
 
 #include <stdio.h>
 
-#define NEW_DIRECTIVE(name, num, ...) name = num,
-
 #define NEW_INSTRUCTIONS(name, num, ...) name = num,
 
 enum commands{
-    #include "test_def_cmd.h"
+    #include "instructions_def.h"
     #undef NEW_DIRECTIVE
     #undef NEW_INSTRUCTIONS
     #undef ENUM
@@ -16,12 +14,10 @@ enum commands{
     venom = -13
 };
 
-#define NEW_DIRECTIVE(name, ...) #name,
-
 #define NEW_INSTRUCTIONS(name, ...) #name,
 
 static const char *commands[] = {
-    #include "test_def_cmd.h"
+    #include "instructions_def.h"
     #undef NEW_DIRECTIVE
     #undef NEW_INSTRUCTIONS
     

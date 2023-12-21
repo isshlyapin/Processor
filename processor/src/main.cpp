@@ -3,6 +3,8 @@
 
 int main(int argc, char *argv[])
 {
+    CHECK_ARGC(argc, 2);
+    
     Storage str = {};
     StorageCtor(&str);
 

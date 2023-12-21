@@ -1,3 +1,6 @@
+#ifndef ASM_DEF
+#define ASM_DEF
+
 #define ASM_CMD_WITHOUT_PRM(pass_num, num)                                                       \
     if (pass_num == 1)                                                                           \
         sz_res_arr++;                                                                            \
@@ -18,7 +21,7 @@
     {                                                                                            \
         if (sscanf(src_arr_ptr + src_pc, NUM_MOD_SCAN "\n%n", &num_user, &ncr) == 1)             \
         {                                                                                        \
-            src_pc     += ncr;                                                                   \
+            src_pc     += (size_t)ncr;                                                           \
             sz_res_arr += 1 + sizeof(num_t);                                                     \
         }                                                                                        \
         else                                                                                     \
@@ -42,24 +45,24 @@
             PRINT_LOG("PRM<" NUM_MOD_PRINT "> CMD_ID <%lu>\n", num_user, pc);                    \
                                                                                                  \
             pc     += 1 + sizeof(num_t);                                                         \
-            src_pc += ncr;                                                                       \
+            src_pc += (size_t)ncr;                                                               \
         }                                                                                        \
         else                                                                                     \
         {                                                                                        \
             sscanf (src_arr_ptr + src_pc, "%s \n%n", name_cmd, &ncr);                            \
-            res_arr_ptr[pc]   = 53;                                                              \
+            res_arr_ptr[pc]   = (char)(num^64);                                                  \
             res_arr_ptr[pc+1] = (char)check_num_reg(name_cmd);                                   \
                                                                                                  \
-            if (res_arr_ptr[pc+1] == ERROR_REG_NAME)                                             \
+            if (res_arr_ptr[pc+1] == ошибка_в_имени_регистра)                                    \
             {                                                                                    \
                 fprintf(stderr, "%s\n", ERROR_TEXT[5]);                                          \
-                return ERROR_REG_NAME;                                                           \
+                return ошибка_в_имени_регистра;                                                  \
             }                                                                                    \
                                                                                                  \
             PRINT_LOG("PRM<%-9s> CMD_ID <%lu>\n", name_cmd, pc);                                 \
                                                                                                  \
             pc     += 2;                                                                         \
-            src_pc += ncr;                                                                       \
+            src_pc += (size_t)ncr;                                                               \
                                                                                                  \
         }                                                                                        \
     }                                                                                            
@@ -81,16 +84,16 @@
                                                                                                   \
         sscanf (src_arr_ptr + src_pc, "%s \n%n" , name_cmd, &ncr);                                \
         res_arr_ptr[pc+1] = (char)check_num_reg(name_cmd);                                        \
-        if (res_arr_ptr[pc+1] == ERROR_REG_NAME)                                                  \
+        if (res_arr_ptr[pc+1] == ошибка_в_имени_регистра)                                         \
         {                                                                                         \
             fprintf(stderr, "%s\n", ERROR_TEXT[5]);                                               \
-            return ERROR_REG_NAME;                                                                \
+            return ошибка_в_имени_регистра;                                                       \
         }                                                                                         \
                                                                                                   \
         PRINT_LOG("PRM<%-9s> CMD_ID <%lu>\n", name_cmd, pc);                                      \
                                                                                                   \
         pc     += 2;                                                                              \
-        src_pc += ncr;                                                                            \
+        src_pc += (size_t)ncr;                                                                    \
     }
 
 #define ASM_JMP_and_CALL(pass_num, num)                                                           \
@@ -100,7 +103,7 @@
             sscanf(src_arr_ptr + src_pc, "%s \n%n", name_cmd, &ncr);                              \
                                                                                                   \
         sz_res_arr += 1 + sizeof(int);                                                            \
-        src_pc += ncr;                                                                            \
+        src_pc += (size_t)ncr;                                                                    \
     }                                                                                             \
     else if (pass_num == 2)                                                                       \
     {                                                                                             \
@@ -128,7 +131,7 @@
         PRINT_LOG("PRM<%-9d> CMD_ID <%lu>\n", num_cmd, pc);                                       \
                                                                                                   \
         pc     += 1 + sizeof(int);                                                                \
-        src_pc += ncr;                                                                            \
+        src_pc += (size_t)ncr;                                                                    \
     }
 
 #define ASM_ORG(pass_num, num)                                                                    \
@@ -138,12 +141,12 @@
                                                                                                   \
         if (ORG_NOT_CORRECT(num_cmd, sz_res_arr))                                                 \
         {                                                                                         \
-            fprintf(stderr, "%s\n", ERROR_TEXT[ERROR_ORG_DIR]);                                   \
-            return ERROR_ORG_DIR;                                                                 \
+            fprintf(stderr, "%s\n", ERROR_TEXT[ошибка_в_директиве_org]);                          \
+            return ошибка_в_директиве_org;                                                        \
         }                                                                                         \
                                                                                                   \
         sz_res_arr = (size_t)num_cmd;                                                             \
-        src_pc += ncr;                                                                            \
+        src_pc += (size_t)ncr;                                                                    \
     }                                                                                             \
     else if (pass_num == 2)                                                                       \
     {                                                                                             \
@@ -156,8 +159,8 @@
                                                                                                   \
         if (ORG_NOT_CORRECT(num_cmd, pc + 1))                                                     \
         {                                                                                         \
-            fprintf(stderr, "%s\n", ERROR_TEXT[ERROR_ORG_DIR]);                                   \
-            return ERROR_ORG_DIR;                                                                 \
+            fprintf(stderr, "%s\n", ERROR_TEXT[ошибка_в_директиве_org]);                          \
+            return ошибка_в_директиве_org;                                                        \
         }                                                                                         \
                                                                                                   \
         for (int i = (int)pc + 1; i < num_cmd; i++)                                               \
@@ -166,5 +169,7 @@
         PRINT_LOG("PRM<%-9d> CMD_ID <%s>\n", num_cmd, "---");                                     \
                                                                                                   \
         pc = (size_t)num_cmd;                                                                     \
-        src_pc += ncr;                                                                            \
+        src_pc += (size_t)ncr;                                                                    \
     }
+
+#endif

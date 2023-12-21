@@ -11,6 +11,8 @@ const size_t MAX_SIZE_STR  = 100;
 const num_t  VENOM_NUM_CMD = -13;
 const int    LEN_NAME_REG  = 3;
 
+
+// STRUCT LIST
 struct Array{
     char   *arr_ptr;
     size_t size_arr;
@@ -21,6 +23,8 @@ struct Label {
     int jmp_id;
 };
 
+
+// FUNCTIONS LIST
 int create_byte_code(FILE *fp_src, FILE *fp_res);
 
 int assembly(struct Array *src_struct_arr, struct Array *res_struct_arr, struct Label *arr_lab, int pass_num);
@@ -31,6 +35,8 @@ size_t search_size_file(FILE *fp_src);
 
 int check_num_reg(const char *str);
 
+
+// DEFINE LIST
 #define NUM_CMD_EQUALS_JMP_OR_CALL(num_cmd) ((num_cmd >= cmd_jmp) && (num_cmd <= cmd_jne)) || (num_cmd == cmd_call)
 
 #define ORG_NOT_CORRECT(org_id, current_pc) ((size_t)org_id < current_pc) || (org_id < 0)

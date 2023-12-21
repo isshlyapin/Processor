@@ -8,11 +8,10 @@
 
 int main(int argc, char *argv[])
 {
-
     #ifdef LOG
-        CHECK_ARGC(argc, 3);
+        CHECK_ARGC(argc, 4);
     #else
-        CHECK_ARGC(argc, 2);
+        CHECK_ARGC(argc, 3);
     #endif
 
     PRINT_INFO("\n___%sWORKING ASSEMBLER%s___\n\n", RED, RESET);
@@ -41,6 +40,7 @@ int create_byte_code(FILE *fp_src, FILE *fp_res)
     PRINT_LOG("\n\n\n---NEW_LOG_INFORMATION---\n");
     
     struct Array *src_struct_arr = ctor_struct_arr(fp_src);
+    
     assert(src_struct_arr != NULL);
 
     struct Array *res_struct_arr = (struct Array*)calloc(1, sizeof(struct Array));
@@ -70,7 +70,7 @@ int create_byte_code(FILE *fp_src, FILE *fp_res)
 
     free(arr_label);
 
-    return WITHOUT_ERROR;
+    return ошибок_нет;
 }
 
 struct Array *ctor_struct_arr(FILE *fp_src)
@@ -105,24 +105,23 @@ size_t search_size_file(FILE *fp_src)
 
 int assembly(struct Array *src_struct_arr, struct Array *res_struct_arr, struct Label *arr_lab, int pass_num)
 {
+    #include "../../library/asm_def.h"
+    
     #define NEW_INSTRUCTIONS(name, num, ASM_DEF, ...)    \
         if (strcmp(name_cmd, #name + 4) == 0)            \
         {                                                \
             check_cmd = true;                            \
             ASM_DEF(pass_num, num);                      \
         }                   
-
+        
     char *src_arr_ptr = src_struct_arr->arr_ptr;
     char *res_arr_ptr = res_struct_arr->arr_ptr;
-
     size_t sz_res_arr = res_struct_arr->size_arr;
     
+    num_t  num_user   = 0;
     int    index_lab  = 1;
-
-    size_t pc     = 0;
-    size_t src_pc = 0;
-
-    num_t num_user = 0;
+    size_t pc         = 0;
+    size_t src_pc     = 0;
 
     while (src_pc < src_struct_arr->size_arr)
     {
@@ -136,8 +135,8 @@ int assembly(struct Array *src_struct_arr, struct Array *res_struct_arr, struct 
         bool read_cmd = sscanf(src_arr_ptr + src_pc, "%s %n", name_cmd, &ncr);
         if (!read_cmd)
         {
-            fprintf(stderr, "%s\n", ERROR_TEXT[ERROR_READ_CMD]);
-            return ERROR_READ_CMD;
+            fprintf(stderr, "%s\n", ERROR_TEXT[ошибка_чтения_команды]);
+            return ошибка_чтения_команды;
         }
         
         if (strcmp(name_cmd, "#") == 0)
@@ -157,20 +156,18 @@ int assembly(struct Array *src_struct_arr, struct Array *res_struct_arr, struct 
                 strncpy(arr_lab[index_lab].name_lab, name_cmd + 1, MAX_SIZE_STR - 1);
                 index_lab++;
             }
-            src_pc += ncr;
+            src_pc += (size_t)ncr;
             continue;             
         }
         else
-            src_pc += ncr;
+            src_pc += (size_t)ncr;
 
-        #include "../../library/asm_def.h"
-
-        #include "../../library/test_def_cmd.h"
+        #include "../../library/instructions_def.h"
 
         if (!check_cmd)
         {
-            fprintf(stderr, "%s\n", ERROR_TEXT[ERROR_NAME_CMD]);
-            return ERROR_NAME_CMD;
+            fprintf(stderr, "%s\n", ERROR_TEXT[ошибка_в_имени_команды]);
+            return ошибка_в_имени_команды;
         }
     }
 
@@ -182,7 +179,7 @@ int assembly(struct Array *src_struct_arr, struct Array *res_struct_arr, struct 
 
     #undef NEW_INSTRUCTIONS
 
-    return WITHOUT_ERROR;
+    return ошибок_нет;
 }
 
 int check_num_reg(const char *str)
@@ -198,6 +195,6 @@ int check_num_reg(const char *str)
         case 'd':
             return rdx;
         default:
-            return ERROR_REG_NAME;
+            return ошибка_в_имени_регистра;
     }
 }

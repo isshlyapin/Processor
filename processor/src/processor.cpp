@@ -11,214 +11,117 @@ static const double EPSILON = 1e-9;
 
 int process_commands(FILE *fp_src, Storage *str)
 {
-
-
-
+    #include "../../library/proc_def.h"
     
-            PRINT_INFO("\n___%sWORKING PROCESSOR%s___\n\n", GREEN, RESET);
+    #define NEW_INSTRUCTIONS(name, num, ASM_CMD, DASM_CMD, PROC_CMD)   \
+        if (num == (num_cmd & 63))                                     \
+        {                                                              \
+            PROC_CMD(num)                                              \
+        }
 
-  size_t sz_src_file = 0;
-  char *src_arr = create_src_arr(fp_src, &sz_src_file);
+    PRINT_INFO("\n___%sWORKING PROCESSOR%s___\n\n", GREEN, RESET);
 
-  for (size_t pc = 0; pc < sz_src_file;) {
-    unsigned char num_cmd = src_arr[pc];
+    struct Array *src_struct_arr = ctor_struct_arr(fp_src);
+    assert(src_struct_arr != NULL);
 
-    PRINTF_INFO_CMD();
+    char *src_arr = src_struct_arr->arr_ptr;
 
-    num_t num1 = VENOM_ELEM;
-    num_t num2 = VENOM_ELEM;
-    int id_jmp = 0;
+    for (size_t pc = 0; pc < src_struct_arr->size_arr; )
+    {
+        char num_cmd   = src_arr[pc];
 
-    switch (num_cmd) {
-    case cmd_push:
-      memcpy(&num1, src_arr + pc + 1, sizeof(num_t));
-      PUSH(num1);
-      pc += 1 + sizeof(num_t);
+        PRINTF_INFO_CMD();
 
-      PRINT_INFO("Numeric from file: <%.2lf>\n", num1);
-      break;
-
-    case 53:
-      num_cmd = src_arr[pc + 1];
-      PUSH(*PTR_REG(num_cmd));
-      pc += 2;
-
-      PRINT_INFO("Register from file: <%s>\n", REGISTER[(int)num_cmd]);
-      break;
-
-    case cmd_pop:
-      num_cmd = src_arr[pc + 1];
-      POP(PTR_REG(num_cmd));
-      pc += 2;
-
-      PRINT_INFO("Register from file: <%s>\n", REGISTER[(int)num_cmd]);
-      break;
-
-    case cmd_sqrt:
-      POP(&num1);
-      PUSH(sqrt(num1));
-      pc++;
-      break;
-
-    case cmd_sin:
-      POP(&num1);
-      PUSH(sin(num1));
-      pc++;
-      break;
-
-    case cmd_cos:
-      POP(&num1);
-      PUSH(cos(num1));
-      pc++;
-      break;
-
-    case cmd_in:
-      printf("Введите число: ");
-      fscanf(stdin, NUM_MOD_SCAN, &num1);
-      PUSH(num1);
-      pc++;
-
-      PRINT_INFO("Numeric user: <%.2lf>\n", num1);
-      break;
-
-    case cmd_add:
-      TWO_POP(num1, num2);
-      PUSH(num2 + num1);
-      pc++;
-      break;
-
-    case cmd_sub:
-      TWO_POP(num1, num2);
-      PUSH(num2 - num1);
-      pc++;
-      break;
-
-    case cmd_mul:
-      TWO_POP(num1, num2);
-      PUSH(num2 * num1);
-      pc++;
-      break;
-
-    case cmd_div:
-      TWO_POP(num1, num2);
-      PUSH(num2 / num1);
-      pc++;
-      break;
-
-    case cmd_jmp:
-      memcpy(&id_jmp, src_arr + pc + 1, sizeof(int));
-      pc = (size_t)id_jmp;
-      break;
-
-    case cmd_jb:
-      JMP_IF(num2 < num1, num1, num2, src_arr);
-      break;
-
-    case cmd_jbe:
-      JMP_IF(num2 <= num1, num1, num2, src_arr);
-      break;
-
-    case cmd_ja:
-      JMP_IF(num2 > num1, num1, num2, src_arr);
-      break;
-
-    case cmd_jae:
-      JMP_IF(num2 >= num1, num1, num2, src_arr);
-      break;
-
-    case cmd_je:
-      JMP_IF(fabs(num2 - num1) < EPSILON, num1, num2, src_arr);
-      break;
-
-    case cmd_jne:
-      JMP_IF(fabs(num2 - num1) > EPSILON, num1, num2, src_arr);
-      break;
-
-    case cmd_call:
-      memcpy(&id_jmp, src_arr + pc + 1, sizeof(int));
-      PUSH_PTR(pc + 1 + sizeof(int));
-      pc = (size_t)id_jmp;
-      break;
-
-    case cmd_ret:
-      POP_PTR(&id_ret);
-      pc = (size_t)id_ret;
-      break;
-
-    case cmd_out:
-      POP(&num1);
-      printf("%sОтвет: [%.2lf]%s\n", YELLOW, num1, RESET);
-      pc++;
-      break;
-
-    case cmd_hlt:
-      pc++;
-      free(src_arr);
-      return WITHOUT_ERROR;
-
-    default:
-      free(src_arr);
-      return ERROR;
+        num_t num1 = VENOM_ELEM;
+        num_t num2 = VENOM_ELEM;
+        int id_jmp = 0;
+        
+        #include "../../library/instructions_def.h"
+ 
+        if (true)
+        {
+            fprintf(stderr, "%s\n", ERROR_TEXT[ошибка_обработки_команды_процессором]);
+            return ошибка_обработки_команды_процессором;
+        }
     }
-    PRINT_INFO("\n");
-  }
 
-  return WITHOUT_ERROR;
+    free(src_struct_arr->arr_ptr);
+    free(src_struct_arr);
+
+    return ошибок_нет;
 }
 
-int StorageCtor(Storage *str) {
-  StackCtor(&str->stk_cmd, STD_STACK_CAP);
-  StackCtor(&str->stk_ptr, STD_STACK_CAP);
+struct Array *ctor_struct_arr(FILE *fp_src)
+{
+    struct Array *new_struct_arr = (struct Array*)malloc(sizeof(struct Array));
 
-  str->regs[rax] = VENOM_ELEM;
-  str->regs[rbx] = VENOM_ELEM;
-  str->regs[rcx] = VENOM_ELEM;
-  str->regs[rdx] = VENOM_ELEM;
+    long   start_ptr_file = ftell(fp_src);
+    size_t sz_file        = search_size_file(fp_src);
+    char   *array         = (char*)calloc(sz_file + 1, sizeof(char));
 
-  return WITHOUT_ERROR;
+    fread(array, sizeof(char), sz_file, fp_src);
+
+    new_struct_arr->arr_ptr  = array;
+    new_struct_arr->size_arr = sz_file;
+    
+    fseek(fp_src, start_ptr_file, SEEK_SET);
+    return new_struct_arr;
 }
 
-int StorageDtor(Storage *str) {
-  StackDtor(&str->stk_cmd);
-  StackDtor(&str->stk_ptr);
-  str->regs[rax] = VENOM_ELEM;
-  str->regs[rbx] = VENOM_ELEM;
-  str->regs[rcx] = VENOM_ELEM;
-  str->regs[rdx] = VENOM_ELEM;
+size_t search_size_file(FILE *fp_src)
+{
+    assert(fp_src != NULL);
 
-  return WITHOUT_ERROR;
+	long start_ftell = ftell(fp_src);
+    fseek(fp_src, 0, SEEK_END);
+    
+    size_t size_file = (size_t)ftell(fp_src);
+    fseek(fp_src, start_ftell, SEEK_SET);
+
+    return size_file;
 }
 
-int StorageDump(Storage *str, const char *file_err, const char *func_err,
-                const int line_err) {
-  fprintf(stderr, "------------------------------------------------------------"
-                  "----------------\n");
-  fprintf(stderr, "Storage[%p] \"str\" called from %s(%d) %s\n", str, file_err,
-          line_err, func_err);
-  fprintf(stderr, "------------------------------------------------------------"
-                  "----------------\n");
-  fprintf(stderr, "Register [rax] = " ELEM_MOD "\n", str->regs[rax]);
-  fprintf(stderr, "Register [rbx] = " ELEM_MOD "\n", str->regs[rbx]);
-  fprintf(stderr, "Register [rcx] = " ELEM_MOD "\n", str->regs[rcx]);
-  fprintf(stderr, "Register [rdx] = " ELEM_MOD "\n", str->regs[rdx]);
-  STACK_DUMP(&str->stk_cmd);
-  STACK_DUMP(&str->stk_ptr);
+int StorageCtor(Storage *str)
+{
+    StackCtor(&str->stk_cmd, STD_STACK_CAP);
+    StackCtor(&str->stk_ptr, STD_STACK_CAP);
 
-  return WITHOUT_ERROR;
+    str->regs[rax] = VENOM_ELEM;
+    str->regs[rbx] = VENOM_ELEM;
+    str->regs[rcx] = VENOM_ELEM;
+    str->regs[rdx] = VENOM_ELEM;
+
+    return ошибок_нет;
 }
 
-char *create_src_arr(FILE *fp_src, size_t *sz_file) {
-  long start = ftell(fp_src);
-  fseek(fp_src, 0L, SEEK_END);
-  *sz_file = (size_t)ftell(fp_src);
-  fseek(fp_src, start, SEEK_SET);
+int StorageDtor(Storage *str) 
+{
+    StackDtor(&str->stk_cmd);
+    StackDtor(&str->stk_ptr);
+    str->regs[rax] = VENOM_ELEM;
+    str->regs[rbx] = VENOM_ELEM;
+    str->regs[rcx] = VENOM_ELEM;
+    str->regs[rdx] = VENOM_ELEM;
 
-  char *src_arr = (char *)calloc(*sz_file + 1, sizeof(char));
-  fread(src_arr, sizeof(char), *sz_file, fp_src);
-  src_arr[*sz_file] = '\0';
+    return ошибок_нет;
+}
 
-  fseek(fp_src, start, SEEK_SET);
-  return src_arr;
+int StorageDump(Storage *str, const char *file_err, const char *func_err, const int line_err)
+{
+    fprintf(stderr, "------------------------------------------------------------"
+                    "----------------\n");
+    fprintf(stderr, "Storage[%p] \"str\" called from %s(%d) %s\n", str, file_err,
+            line_err, func_err);
+    fprintf(stderr, "------------------------------------------------------------"
+                    "----------------\n");
+    fprintf(stderr, "Register [rax] = " ELEM_MOD "\n", str->regs[rax]);
+    fprintf(stderr, "Register [rbx] = " ELEM_MOD "\n", str->regs[rbx]);
+    fprintf(stderr, "Register [rcx] = " ELEM_MOD "\n", str->regs[rcx]);
+    fprintf(stderr, "Register [rdx] = " ELEM_MOD "\n", str->regs[rdx]);
+    STACK_DUMP(&str->stk_cmd);
+    STACK_DUMP(&str->stk_ptr);
+
+    return ошибок_нет;
 }
 
 num_t *ptr_reg(Storage *str, int id_reg) { return &str->regs[id_reg]; }
