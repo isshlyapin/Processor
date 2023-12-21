@@ -14,7 +14,7 @@ int process_commands(FILE *fp_src, Storage *str)
 
 
 
-
+    
             PRINT_INFO("\n___%sWORKING PROCESSOR%s___\n\n", GREEN, RESET);
 
   size_t sz_src_file = 0;

@@ -8,7 +8,7 @@
 #define NEW_INSTRUCTIONS(name, num, ...) name = num,
 
 enum commands{
-    #include "test-def-cmd.txt"
+    #include "test_def_cmd.h"
     #undef NEW_DIRECTIVE
     #undef NEW_INSTRUCTIONS
     #undef ENUM
@@ -21,7 +21,7 @@ enum commands{
 #define NEW_INSTRUCTIONS(name, ...) #name,
 
 static const char *commands[] = {
-    #include "test-def-cmd.txt"
+    #include "test_def_cmd.h"
     #undef NEW_DIRECTIVE
     #undef NEW_INSTRUCTIONS
     

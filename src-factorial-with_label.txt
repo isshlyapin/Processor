@@ -1,0 +1,30 @@
+push 10
+
+call factorial
+
+push rax
+out
+hlt
+
+:factorial
+pop rax
+push rax
+
+push rax
+push 1
+je end_recursion
+
+push rax
+push 1
+sub
+
+call factorial
+
+push rax
+mul
+pop rax
+ret
+
+:end_recursion
+pop rax
+ret

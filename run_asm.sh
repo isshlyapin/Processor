@@ -12,10 +12,7 @@ integer-divide-by-zero,leak,nonnull-attribute,null,object-size,return,\
 returns-nonnull-attribute,shift,signed-integer-overflow,undefined,\
 unreachable,vla-bound,vptr"
 
-FILE=asm
-if test -f "$FILE"; then
-    ./asm "src-factorial.txt" "res_asm.txt" "log_file.txt"
-else
-    g++ "-DINFO" "-DLOG" $CXXFLAGS assembler/src/asm.cpp -o asm && ./asm "src-factorial.txt" "res_asm.txt" "log_file.txt"
-FILE
+ASM_START_FILE="src-factorial-with_label.txt res_asm.txt log_file.txt"
 
+g++ "-DINFO" "-DLOG" $CXXFLAGS assembler/src/asm.cpp -o asm 
+./asm $ASM_START_FILE
