@@ -118,8 +118,8 @@ int assembly(struct Array *src_struct_arr, struct Array *res_struct_arr, struct 
     char *res_arr_ptr = res_struct_arr->arr_ptr;
     size_t sz_res_arr = res_struct_arr->size_arr;
     
-    num_t  num_user   = 0;
     int    index_lab  = 1;
+    num_t  num_user   = 0;
     size_t pc         = 0;
     size_t src_pc     = 0;
 

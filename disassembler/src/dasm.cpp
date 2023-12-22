@@ -1,131 +1,97 @@
+#include <stdlib.h>
+
 #include "../include/dasm.h"
 #include "../../library/commands.h"
-#include <stdlib.h>
 #include "../../library/color.h"
+#include "../../library/error.h"
 
-int main()
+int main(int argc, char *argv[])
 {
-    #ifdef INFO
-    printf("\n___%sWORKING DISASSEMBLER%s___\n\n", CYAN, RESET);
-    #endif
+    CHECK_ARGC(argc, 3);
 
-    FILE *fp_src = fopen(NAME_SRC_DASM, "rb");
-    if (fp_src == NULL)
-    {
-        fprintf(stderr, "ERROR: Don't open source file\n");
-        return ERROR;
-    }
+    PRINT_INFO("\n___%sWORKING DISASSEMBLER%s___\n\n", CYAN, RESET);
 
-    FILE *fp_res = fopen(NAME_RES_DASM, "w");
-    if (fp_res == NULL)
-    {
-        fprintf(stderr, "ERROR: Don't open source file\n");
-        return ERROR;
-    }       
+    FILE *fp_src = fopen(argv[1], "rb");
+    CHECK_OPEN_FILE(fp_src);
 
-    bite_code_in_text(fp_src, fp_res);
+    FILE *fp_res = fopen(argv[2], "w");
+    CHECK_OPEN_FILE(fp_res);
+
+    byte_code_in_text(fp_src, fp_res);
 
     fclose(fp_src);
     fclose(fp_res);
 }
 
-int bite_code_in_text(FILE *fp_src, FILE *fp_res)
+int byte_code_in_text(FILE *fp_src, FILE *fp_res)
 {
     assert(fp_res != NULL);
     assert(fp_src != NULL);
 
-    size_t sz_src_file = 0;
-    char *buf = create_buf(fp_src, &sz_src_file);
+    #include "../../library/dasm_def.h"
 
-    char  num_command          = VENOM_NUM_COMMAND;
-    num_t num                  = 0;
-    int   jmp_id               = 0;
+    #define NEW_INSTRUCTIONS(name, num, ASM_CMD, DASM_CMD, ...)   \
+        if ((num_cmd & 63) == num)                                \
+        {                                                         \
+            DASM_CMD(num);                                        \
+        }
 
-    for (size_t pc = 0; pc < sz_src_file; )
+    struct Array *src_struct_arr = ctor_struct_arr(fp_src);
+    assert(src_struct_arr != NULL);
+
+    char *array = src_struct_arr->arr_ptr;
+
+    num_t num    = 0;
+    int   jmp_id = 0;
+
+    for (size_t pc = 0; pc < src_struct_arr->size_arr; )
     {
-        num_command = buf[pc];
+        char num_cmd   = array[pc];
+        bool check_cmd = false;
 
-        if (num_command == cmd_hlt)
-        {
-            fprintf(fp_res, "%s", commands[NUMBER_INSTRUCTIONS]);  // index hlt always = NUMBER_INSTRUCTIONS			
-            pc++;
+        #include "../../library/instructions_def.h"
 
-            #ifdef INFO
-            printf("Name_command: %s[%4s]%s", MAGENTA, commands[NUMBER_INSTRUCTIONS], RESET);
-            #endif
-        }
-        else if (num_command == cmd_push)
+        if (!check_cmd)
         {
-            fprintf(fp_res, "%s ", commands[cmd_push]);
-            memcpy(&num, buf + pc + 1, sizeof(num_t));
-            fprintf(fp_res, NUM_MOD_PRINT "\n", num);
-            pc += 1 + sizeof(num_t);    
-        
-            #ifdef INFO
-            printf("Name_command: %s[%4s]%s", MAGENTA, commands[cmd_push], RESET);
-            #endif
+            fprintf(stderr, "%s\n", ERROR_TEXT[ошибка_в_имени_команды]);
+            return ошибка_в_имени_команды;
         }
-        else if (num_command == cmd_rpush)
-        {
-            fprintf(fp_res, "%s " , commands[cmd_push]);
-            fprintf(fp_res, "%s\n", REGISTER[(int)buf[pc+1]]);
-            pc += 2;    
 
-            #ifdef INFO
-            printf("Name_command: %s[%4s]%s", MAGENTA, commands[cmd_push], RESET);
-            #endif
-        }
-        else if (num_command == cmd_pop)
-        {
-            fprintf(fp_res, "%s " , commands[cmd_pop]);
-            fprintf(fp_res, "%s\n", REGISTER[(int)buf[pc+1]]);    
-            pc += 2;
-
-            #ifdef INFO
-            printf("Name_command: %s[%4s]%s", MAGENTA, commands[cmd_pop], RESET);
-            #endif 
-        }
-        else if (num_command >= cmd_jmp && num_command <= cmd_jne)
-        {
-            fprintf(fp_res, "%s " , commands[(int)num_command]);
-            memcpy(&jmp_id, buf + pc + 1, sizeof(int));
-            fprintf(fp_res, "%d\n", jmp_id);    
-            pc += 1 + sizeof(int);
-
-            #ifdef INFO
-            printf("Name_command: %s[%4s]%s", MAGENTA, commands[(int)num_command], RESET);
-            #endif
-        }
-        else
-        {
-            fprintf(fp_res, "%s\n", commands[(int)num_command]);
-            pc++;
-            
-            #ifdef INFO
-            printf("Name_command: %s[%4s]%s", MAGENTA, commands[(int)num_command], RESET);
-            #endif
-        }
-        #ifdef INFO
-        printf("%s[%2d]%s\n", RED, (int)num_command, RESET);
-        #endif
+        PRINT_INFO("%s[%2d]%s\n", RED, num_cmd & 63, RESET);
     }
 
-    free(buf);
+    free(src_struct_arr->arr_ptr);
+    free(src_struct_arr);
 
-    return 0;
+    return ошибок_нет;
 }
 
-char *create_buf(FILE *fp_src, size_t *sz_file)
+struct Array *ctor_struct_arr(FILE *fp_src)
 {
-    long start_file = ftell(fp_src);
-    fseek(fp_src, 0L, SEEK_END);
-    *sz_file = (size_t)ftell(fp_src);
-    fseek(fp_src, start_file, SEEK_SET);
+    struct Array *new_struct_arr = (struct Array*)malloc(sizeof(struct Array));
 
-    char *buf = (char*)calloc(*sz_file + 1, sizeof(char));
-    fread(buf, sizeof(char), *sz_file, fp_src);
-    buf[*sz_file] = '\0';
+    long   start_ptr_file = ftell(fp_src);
+    size_t sz_file        = search_size_file(fp_src);
+    char   *array         = (char*)calloc(sz_file + 1, sizeof(char));
 
-    fseek(fp_src, start_file, SEEK_SET);
-    return buf;
+    fread(array, sizeof(char), sz_file, fp_src);
+
+    new_struct_arr->arr_ptr  = array;
+    new_struct_arr->size_arr = sz_file;
+    
+    fseek(fp_src, start_ptr_file, SEEK_SET);
+    return new_struct_arr;
+}
+
+size_t search_size_file(FILE *fp_src)
+{
+    assert(fp_src != NULL);
+
+	long start_ftell = ftell(fp_src);
+    fseek(fp_src, 0, SEEK_END);
+    
+    size_t size_file = (size_t)ftell(fp_src);
+    fseek(fp_src, start_ftell, SEEK_SET);
+
+    return size_file;
 }

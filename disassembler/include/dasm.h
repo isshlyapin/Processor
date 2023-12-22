@@ -7,15 +7,23 @@
 
 #include "../../library/config.h"
 
-const size_t max_size_c        = 100;
+
+// STRUCT LIST
+struct Array{
+    char   *arr_ptr;
+    size_t size_arr;
+};
+
+
+const size_t MAX_SIZE_STR      = 100;
 const num_t  VENOM_NUM_COMMAND = -13;
-const int    ERROR             = 1;
 
-const char *NAME_SRC_DASM = "res_asm.txt" ;
-const char *NAME_RES_DASM = "res_dasm.txt";
 
-int bite_code_in_text(FILE *fp_src, FILE *fp_res);
+// FUNCTIONS LIST
+int byte_code_in_text(FILE *fp_src, FILE *fp_res);
 
-char *create_buf(FILE *fp_src, size_t *sz_file);
+struct Array *ctor_struct_arr(FILE *fp_src);
+
+size_t search_size_file(FILE *fp_src);
 
 #endif
