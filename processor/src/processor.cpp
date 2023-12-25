@@ -1,17 +1,9 @@
 #include "../include/processor.h"
-#include "../../library/color.h"
 #include "../../library/commands.h"
-#include "../../library/error.h"
-#include "../../library/stack.h"
-
-static const size_t MAX_SIZE_STR = 100;
-static const char VENOM_NUM_CMD = -13;
-
-static const double EPSILON = 1e-9;
 
 int process_commands(FILE *fp_src, Storage *str)
 {
-    #include "../../library/proc_def.h"
+    #include "../../library/cmd_define.h"
     
     #define NEW_INSTRUCTIONS(name, num, ASM_CMD, DASM_CMD, PROC_CMD)   \
         if (num == (num_cmd & 63))                                     \

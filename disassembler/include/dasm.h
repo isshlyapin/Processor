@@ -2,21 +2,22 @@
 #define DASM_H
 
 #include <stdio.h>
-#include <assert.h>
+#include <malloc.h>
 #include <string.h>
+#include <assert.h>
 
 #include "../../library/config.h"
+#include "../../library/commands.h"
+#include "../../library/error.h"
+
+#include "../../library/color.h"
 
 
 // STRUCT LIST
-struct Array{
+    struct Array{
     char   *arr_ptr;
     size_t size_arr;
 };
-
-
-const size_t MAX_SIZE_STR      = 100;
-const num_t  VENOM_NUM_COMMAND = -13;
 
 
 // FUNCTIONS LIST

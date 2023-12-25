@@ -1,5 +1,4 @@
 #include "../include/processor.h"
-#include "../../library/error.h"
 
 int main(int argc, char *argv[])
 {

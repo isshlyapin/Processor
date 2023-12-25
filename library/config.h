@@ -4,6 +4,9 @@
 #include <stdio.h>
 
 static const size_t STD_STACK_CAP = 10;
+static const size_t MAX_SIZE_STR  = 100;
+static const char   VENOM_NUM_CMD = -13;
+static const int    LEN_NAME_REG  = 3;
 
 typedef double num_t;
 

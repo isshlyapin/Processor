@@ -1,14 +1,19 @@
 #ifndef PROCESSOR_H
 #define PROCESSOR_H
 
-#include <assert.h>
-#include <math.h>
 #include <stdio.h>
-#include <stdlib.h>
+#include <malloc.h>
 #include <string.h>
+#include <math.h>
+#include <assert.h>
 
 #include "../../library/config.h"
 #include "../../library/stack.h"
+#include "../../library/error.h"
+
+#include "../../library/color.h"
+
+static const double EPSILON = 1e-9;
 
 
 // STRUCT LIST

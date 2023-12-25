@@ -1,10 +1,4 @@
-#include <cstdio>
-#include <stdlib.h>
-
 #include "../include/asm.h"
-#include "../../library/commands.h"
-#include "../../library/color.h"
-#include "../../library/error.h"
 
 int main(int argc, char *argv[])
 {
@@ -105,7 +99,7 @@ size_t search_size_file(FILE *fp_src)
 
 int assembly(struct Array *src_struct_arr, struct Array *res_struct_arr, struct Label *arr_lab, int pass_num)
 {
-    #include "../../library/asm_def.h"
+    #include "../../library/cmd_define.h"
     
     #define NEW_INSTRUCTIONS(name, num, ASM_DEF, ...)    \
         if (strcmp(name_cmd, #name + 4) == 0)            \

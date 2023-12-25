@@ -1,9 +1,4 @@
-#include <stdlib.h>
-
 #include "../include/dasm.h"
-#include "../../library/commands.h"
-#include "../../library/color.h"
-#include "../../library/error.h"
 
 int main(int argc, char *argv[])
 {
@@ -28,13 +23,13 @@ int byte_code_in_text(FILE *fp_src, FILE *fp_res)
     assert(fp_res != NULL);
     assert(fp_src != NULL);
 
-    #include "../../library/dasm_def.h"
+    #include "../../library/cmd_define.h"
 
     #define NEW_INSTRUCTIONS(name, num, ASM_CMD, DASM_CMD, ...)   \
         if ((num_cmd & 63) == num)                                \
         {                                                         \
             DASM_CMD(num);                                        \
-        }
+        } 
 
     struct Array *src_struct_arr = ctor_struct_arr(fp_src);
     assert(src_struct_arr != NULL);
