@@ -8,7 +8,7 @@ int process_commands(FILE *fp_src, Storage *str)
     #define NEW_INSTRUCTIONS(name, num, ASM_CMD, DASM_CMD, PROC_CMD)   \
         if (num == (num_cmd & 63))                                     \
         {                                                              \
-            PROC_CMD(num)                                              \
+            PROC_CMD(num);                                             \
         }
 
     PRINT_INFO("\n___%sWORKING PROCESSOR%s___\n\n", GREEN, RESET);
@@ -32,7 +32,7 @@ int process_commands(FILE *fp_src, Storage *str)
  
         if (true)
         {
-            fprintf(stderr, "%s\n", ERROR_TEXT[ошибка_обработки_команды_процессором]);
+            PRINT_ERROR("%s\n", ERROR_TEXT[ошибка_обработки_команды_процессором]);
             return ошибка_обработки_команды_процессором;
         }
     }
@@ -90,6 +90,7 @@ int StorageDtor(Storage *str)
 {
     StackDtor(&str->stk_cmd);
     StackDtor(&str->stk_ptr);
+    
     str->regs[rax] = VENOM_ELEM;
     str->regs[rbx] = VENOM_ELEM;
     str->regs[rcx] = VENOM_ELEM;
@@ -100,16 +101,17 @@ int StorageDtor(Storage *str)
 
 int StorageDump(Storage *str, const char *file_err, const char *func_err, const int line_err)
 {
-    fprintf(stderr, "------------------------------------------------------------"
-                    "----------------\n");
-    fprintf(stderr, "Storage[%p] \"str\" called from %s(%d) %s\n", str, file_err,
-            line_err, func_err);
-    fprintf(stderr, "------------------------------------------------------------"
-                    "----------------\n");
+    fprintf(stderr, "----------------------------------------------------------------------------\n");
+    
+    fprintf(stderr, "Storage[%p] \"str\" called from %s(%d) %s\n", str, file_err, line_err, func_err);
+    
+    fprintf(stderr, "----------------------------------------------------------------------------\n");
+    
     fprintf(stderr, "Register [rax] = " ELEM_MOD "\n", str->regs[rax]);
     fprintf(stderr, "Register [rbx] = " ELEM_MOD "\n", str->regs[rbx]);
     fprintf(stderr, "Register [rcx] = " ELEM_MOD "\n", str->regs[rcx]);
     fprintf(stderr, "Register [rdx] = " ELEM_MOD "\n", str->regs[rdx]);
+    
     STACK_DUMP(&str->stk_cmd);
     STACK_DUMP(&str->stk_ptr);
 

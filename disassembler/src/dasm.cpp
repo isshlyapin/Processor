@@ -48,7 +48,7 @@ int byte_code_in_text(FILE *fp_src, FILE *fp_res)
 
         if (!check_cmd)
         {
-            fprintf(stderr, "%s\n", ERROR_TEXT[ошибка_в_имени_команды]);
+            PRINT_ERROR("%s\n", ERROR_TEXT[ошибка_в_имени_команды]);
             return ошибка_в_имени_команды;
         }
 

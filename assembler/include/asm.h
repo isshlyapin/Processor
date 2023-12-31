@@ -1,6 +1,7 @@
 #ifndef ASM_H
 #define ASM_H
 
+// #include <stdlib.h>
 #include <stdio.h>
 #include <malloc.h>
 #include <string.h>
@@ -11,6 +12,15 @@
 #include "../../library/error.h"
 
 #include "../../library/color.h"
+
+#define INFO
+#define LOG
+
+const int LEN_LOG_STR = 74;
+const int TWO_COLUM   = 19;
+const int THREE_COLUM = 38;
+const int FOUR_COLUM  = 57;
+const int FIVE_COLUM  = 71;
 
 
 // STRUCT LIST
@@ -35,6 +45,10 @@ struct Array *ctor_struct_arr(FILE *fp_src);
 size_t search_size_file(FILE *fp_src);
 
 int check_num_reg(const char *str);
+
+void create_log_str(char *str, int flag, const char *info);
+
+char *my_int_to_string(int num, char *str_res);
 
 
 // DEFINE LIST

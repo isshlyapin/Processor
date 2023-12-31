@@ -17,6 +17,10 @@ typedef double num_t;
     #define PRINT_INFO(str ...) printf(str);
 #else
     #define PRINT_INFO(str ...) {};
-#endif
+#endif //! INFO
 
-#endif
+#define PRINT_ERROR(str ...)                                                            \
+    fprintf(stderr, str);                                                               \
+    fprintf(stderr, "file: %s; func: %s; line: %d\n", __FILE__ , __func__ , __LINE__ ); \
+
+#endif //! CONFIG_H

@@ -37,18 +37,18 @@ static const char *ERROR_TEXT[] = {
     "Ошибка: Процессор не смог обработать команду"
 };
 
-#define CHECK_OPEN_FILE(file_ptr)                                      \
-    if (file_ptr == NULL)                                              \
-    {                                                                  \
-        fprintf(stderr, "%s\n", ERROR_TEXT[ошибка_открытия_файла]);    \
-        return ошибка_открытия_файла;                                  \
+#define CHECK_OPEN_FILE(file_ptr)                                          \
+    if (file_ptr == NULL)                                                  \
+    {                                                                      \
+        PRINT_ERROR("%s\n", ERROR_TEXT[ошибка_открытия_файла]);            \
+        return ошибка_открытия_файла;                                      \
     }
 
-#define CHECK_ARGC(num, right_num)                                                           \
-    if (num < right_num)                                                                     \
-    {                                                                                        \
-        fprintf(stderr, "%s\n", ERROR_TEXT[ошибка_количество_аргументов_командной_строки]);  \
-        return ошибка_количество_аргументов_командной_строки;                                \
+#define CHECK_ARGC(num, right_num)                                                               \
+    if (num < right_num)                                                                         \
+    {                                                                                            \
+        PRINT_ERROR("%s\n", ERROR_TEXT[ошибка_количество_аргументов_командной_строки]);          \
+        return ошибка_количество_аргументов_командной_строки;                                    \
     }
     
 #endif

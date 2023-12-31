@@ -3,6 +3,7 @@
         "cmath": "cpp",
         "*.txt": "plaintext",
         "chrono": "cpp",
-        "typeinfo": "cpp"
+        "typeinfo": "cpp",
+        "string_view": "cpp"
     }
 }
