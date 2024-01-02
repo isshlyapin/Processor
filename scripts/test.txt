@@ -1,0 +1,435 @@
+
+static const size_t STD_STACK_CAP = 10;
+static const size_t MAX_SIZE_STR = 100;
+static const char VENOM_NUM_CMD = -13;
+static const int LEN_NAME_REG = 3;
+
+typedef double num_t;
+
+
+
+enum commands{
+cmd_hlt = 0,
+dir_org = 1,
+cmd_push = 2,
+cmd_pop = 3,
+cmd_in = 4,
+cmd_sqrt = 5,
+cmd_sin = 6,
+cmd_cos = 7,
+cmd_add = 8,
+cmd_sub = 9,
+cmd_mul = 10,
+cmd_div = 11,
+cmd_jmp = 12,
+cmd_jb = 13,
+cmd_jbe = 14,
+cmd_ja = 15,
+cmd_jae = 16,
+cmd_je = 17,
+cmd_jne = 18,
+cmd_call = 19,
+cmd_ret = 20,
+cmd_out = 21,
+venom = -13
+};
+
+
+
+static const char *commands[] = {
+"cmd_hlt",
+"dir_org",
+"cmd_push",
+"cmd_pop",
+"cmd_in",
+"cmd_sqrt",
+"cmd_sin",
+"cmd_cos",
+"cmd_add",
+"cmd_sub",
+"cmd_mul",
+"cmd_div",
+"cmd_jmp",
+"cmd_jb",
+"cmd_jbe",
+"cmd_ja",
+"cmd_jae",
+"cmd_je",
+"cmd_jne",
+"cmd_call",
+"cmd_ret",
+"cmd_out",
+    "VENOM"
+};
+
+enum REGISTER{
+    rax = 0,
+    rbx = 1,
+    rcx = 2,
+    rdx = 3
+};
+
+static const char *ERROR_TEXT[] = {
+    "Ошибка: Её нет -- ОТЛИЧНАЯ РАБОТА --",
+    "Ошибка: Имя отсутствует",
+    "Ошибка: Не получилось открыть файл",
+    "Ошибка: Имя команды не было прочитано",
+    "Ошибка: Команда не распознана",
+    "Ошибка: Некорректное имя регистра",
+    "Ошибка: Некорректный номер регистра",
+    "Ошибка: Директива org указывает на задействованную область памяти",
+    "Ошибка: Недостаточное количество аргументов командной строки",
+    "Ошибка: Процессор не смог обработать команду"
+};
+
+const int LEN_LOG_STR = 74;
+const int TWO_COLUM = 19;
+const int THREE_COLUM = 38;
+const int FOUR_COLUM = 57;
+const int FIVE_COLUM = 71;
+
+
+
+struct Array{
+    char *arr_ptr;
+    size_t size_arr;
+};
+
+struct Label {
+    char name_lab[MAX_SIZE_STR];
+    int jmp_id;
+};
+
+
+
+int create_byte_code(FILE *fp_src, FILE *fp_res);
+
+int assembly(struct Array *src_struct_arr, struct Array *res_struct_arr, struct Label *arr_lab, int pass_num);
+
+struct Array *ctor_struct_arr(FILE *fp_src);
+
+size_t search_size_file(FILE *fp_src);
+
+int check_num_reg(const char *str);
+
+void create_log_str(char *str, int flag, const char *info);
+
+char *my_int_to_string(int num, char *str_res);
+
+int main(int argc, char *argv[])
+{
+
+    if (argc < 4) { fprintf(stderr, "%s\n", ERROR_TEXT[8]); fprintf(stderr, "file: %s; func: %s; line: %d\n", "../assembler/src/asm.cpp" , __func__ , 82 );; return 8; };
+
+
+
+
+    printf("\n___%sWORKING ASSEMBLER%s___\n\n", "\033[1;31m", "\033[0m");;
+
+    fp_log = fopen(argv[3], "a"); if (fp_log == NULL) { fprintf(stderr, "%s\n", ERROR_TEXT[2]); fprintf(stderr, "file: %s; func: %s; line: %d\n", "../assembler/src/asm.cpp" , __func__ , 89 );; return 2; };;
+
+    FILE *fp_src = fopen(argv[1], "r");
+    if (fp_src == NULL) { fprintf(stderr, "%s\n", ERROR_TEXT[2]); fprintf(stderr, "file: %s; func: %s; line: %d\n", "../assembler/src/asm.cpp" , __func__ , 92 );; return 2; };
+
+    FILE *fp_res = fopen(argv[2], "wb");
+    if (fp_res == NULL) { fprintf(stderr, "%s\n", ERROR_TEXT[2]); fprintf(stderr, "file: %s; func: %s; line: %d\n", "../assembler/src/asm.cpp" , __func__ , 95 );; return 2; };
+
+    create_byte_code(fp_src, fp_res);
+
+    fclose(fp_res);
+    fclose(fp_src);
+
+    fclose(fp_log);
+}
+
+int create_byte_code(FILE *fp_src, FILE *fp_res)
+{
+    assert(fp_res != NULL);
+    assert(fp_src != NULL);
+
+    char log_str[LEN_LOG_STR] = {};
+    create_log_str(log_str, 0, "VENOM");
+
+    struct Array *src_struct_arr = ctor_struct_arr(fp_src);
+
+    assert(src_struct_arr != NULL);
+
+    struct Array *res_struct_arr = (struct Array*)calloc(1, sizeof(struct Array));
+    assert(res_struct_arr != NULL);
+
+    struct Label *arr_label = (struct Label*)calloc(100, sizeof(struct Label));
+    assert(arr_label != NULL);
+
+    assembly(src_struct_arr, res_struct_arr, arr_label, 1);
+    assembly(src_struct_arr, res_struct_arr, arr_label, 2);
+
+    res_struct_arr->arr_ptr[res_struct_arr->size_arr] = (char)cmd_hlt;
+
+    char num_str[30] = {};
+    create_log_str(log_str, -1, "VENOM");
+    create_log_str(log_str, 1, commands[cmd_hlt] + 4);
+    create_log_str(log_str, 2, my_int_to_string(cmd_hlt, num_str));
+    create_log_str(log_str, 3, "----");
+    create_log_str(log_str, 4, my_int_to_string((int)res_struct_arr->size_arr, num_str));
+    fprintf(fp_log, "%s", log_str);
+    create_log_str(log_str, -2, "VENOM");;
+
+
+    printf("name_cmd: %s[%4s]%s", "\033[1;31m", "hlt", "\033[0m");;
+    printf("%s[%2d]%s\n", "\033[1;35m", cmd_hlt, "\033[0m");;
+
+    fwrite(res_struct_arr->arr_ptr, sizeof(char), res_struct_arr->size_arr + 1, fp_res);
+
+    free(src_struct_arr->arr_ptr);
+    free(src_struct_arr);
+
+    free(res_struct_arr->arr_ptr);
+    free(res_struct_arr);
+
+    free(arr_label);
+
+    return 0;
+}
+
+char *my_int_to_string(int num, char *str_res)
+{
+    char num_str[30] = {};
+
+    if (num == 0)
+    {
+        str_res[0] = '0';
+        str_res[1] = '\0';
+    }
+    else
+    {
+        for (int i = 0; i < 30; i++)
+            num_str[i] = '\0';
+
+        for (int j = 0; num != 0; j++)
+        {
+            num_str[j] = 48 + num % 10;
+            num /= 10;
+        }
+
+
+        int step = 0;
+        for (int k = 29; k > 0; k--)
+        {
+            if (num_str[k] == '\0')
+                continue;
+            else
+            {
+                str_res[step] = num_str[k];
+                step++;
+            }
+        }
+        str_res[step] = '\0';
+    }
+
+    return str_res;
+}
+
+void create_log_str(char *str, int flag, const char *info)
+{
+    if (flag == -1)
+    {
+        for (int i = 0; i < LEN_LOG_STR; i++) { if ((i == 0) || (i == TWO_COLUM) || (i == THREE_COLUM) || (i == FOUR_COLUM) || (i == FIVE_COLUM)) str[i] = '|'; else if (i == (LEN_LOG_STR - 2)) str[i] = '\n'; else if (i == (LEN_LOG_STR - 1)) str[i] = '\0'; else str[i] = ' '; };
+    }
+    else if (flag == -2)
+    {
+        for (int i = 0; i < LEN_LOG_STR; i++) { if ((i == 0) || (i == FIVE_COLUM)) str[i] = '|'; else if ( i == (LEN_LOG_STR - 2)) str[i] = '\n'; else if (i == (LEN_LOG_STR - 1)) str[i] = '\0'; else str[i] = '-'; } fprintf(fp_log, "%s", str);;
+    }
+    else if (flag == 0)
+    {
+        fprintf(fp_log, "\n\n");
+        for (int i = 0; i < LEN_LOG_STR; i++) { if ((i == 0) || (i == FIVE_COLUM)) str[i] = '|'; else if ( i == (LEN_LOG_STR - 2)) str[i] = '\n'; else if (i == (LEN_LOG_STR - 1)) str[i] = '\0'; else str[i] = '-'; } fprintf(fp_log, "%s", str);;
+        for (int i = 0; i < LEN_LOG_STR; i++) { if ((i == 0) || (i == FIVE_COLUM)) str[i] = '|'; else if ( i == (LEN_LOG_STR - 2)) str[i] = '\n'; else if (i == (LEN_LOG_STR - 1)) str[i] = '\0'; else str[i] = ' '; } int j = 0, k = 0; while ("Jan  1 2024"[j] != '\0') { str[((LEN_LOG_STR - 19) / 2) + j] = "Jan  1 2024"[j]; j++; } while ("18:01:45"[k] != '\0') { str[((LEN_LOG_STR - 19) / 2) + j + 1] = "18:01:45"[k]; j++; k++; } fprintf(fp_log, "%s", str);;
+        for (int i = 0; i < LEN_LOG_STR; i++) { if ((i == 0) || (i == FIVE_COLUM)) str[i] = '|'; else if ( i == (LEN_LOG_STR - 2)) str[i] = '\n'; else if (i == (LEN_LOG_STR - 1)) str[i] = '\0'; else str[i] = '-'; } fprintf(fp_log, "%s", str);;
+        for (int i = 0; i < LEN_LOG_STR; i++) { if ((i == 0) || (i == TWO_COLUM) || (i == THREE_COLUM) || (i == FOUR_COLUM) || (i == FIVE_COLUM)) str[i] = '|'; else if (i == (LEN_LOG_STR - 2)) str[i] = '\n'; else if (i == (LEN_LOG_STR - 1)) str[i] = '\0'; else str[i] = ' '; };
+        for (int i = 0; "Name cmd"[i] != '\0'; i++) str[5 + i] = "Name cmd"[i]; for (int i = 0; "Num cmd"[i] != '\0'; i++) str[TWO_COLUM + 5 + i] = "Num cmd"[i]; for (int i = 0; "Parameter"[i] != '\0'; i++) str[THREE_COLUM + 5 + i] = "Parameter"[i]; for (int i = 0; "CMD ID"[i] != '\0'; i++) str[FOUR_COLUM + 5 + i] = "CMD ID"[i]; fprintf(fp_log, "%s", str);;
+        for (int i = 0; i < LEN_LOG_STR; i++) { if ((i == 0) || (i == FIVE_COLUM)) str[i] = '|'; else if ( i == (LEN_LOG_STR - 2)) str[i] = '\n'; else if (i == (LEN_LOG_STR - 1)) str[i] = '\0'; else str[i] = '-'; } fprintf(fp_log, "%s", str);;
+    }
+    else if (flag == 1)
+    {
+        for (int i = 0; info[i] != '\0'; i++)
+            str[5 + i] = info[i];
+    }
+    else if (flag == 2)
+    {
+        for (int i = 0; info[i] != '\0'; i++)
+            str[TWO_COLUM + 5 + i] = info[i];
+    }
+    else if (flag == 3)
+    {
+        for (int i = 0; info[i] != '\0'; i++)
+            str[THREE_COLUM + 5 + i] = info[i];
+    }
+    else if (flag == 4)
+    {
+        for (int i = 0; info[i] != '\0'; i++)
+            str[FOUR_COLUM + 5 + i] = info[i];
+    }
+}
+
+struct Array *ctor_struct_arr(FILE *fp_src)
+{
+    struct Array *new_struct_arr = (struct Array*)malloc(sizeof(struct Array));
+
+    long start_ptr_file = ftell(fp_src);
+    size_t sz_file = search_size_file(fp_src);
+    char *array = (char*)calloc(sz_file + 1, sizeof(char));
+
+    fread(array, sizeof(char), sz_file, fp_src);
+
+    new_struct_arr->arr_ptr = array;
+    new_struct_arr->size_arr = sz_file;
+
+    fseek(fp_src, start_ptr_file, SEEK_SET);
+    return new_struct_arr;
+}
+
+size_t search_size_file(FILE *fp_src)
+{
+    assert(fp_src != NULL);
+
+ long start_ftell = ftell(fp_src);
+    fseek(fp_src, 0, SEEK_END);
+
+    size_t size_file = (size_t)ftell(fp_src);
+    fseek(fp_src, start_ftell, SEEK_SET);
+
+    return size_file;
+}
+
+int assembly(struct Array *src_struct_arr, struct Array *res_struct_arr, struct Label *arr_lab, int pass_num)
+{
+    char *src_arr_ptr = src_struct_arr->arr_ptr;
+    char *res_arr_ptr = res_struct_arr->arr_ptr;
+    size_t sz_res_arr = res_struct_arr->size_arr;
+
+    int index_lab = 1;
+    num_t num_user = 0;
+    size_t pc = 0;
+    size_t src_pc = 0;
+
+    char log_str[LEN_LOG_STR] = {};
+    char num_str[30] = {};
+
+    while (src_pc < src_struct_arr->size_arr)
+    {
+        bool check_cmd = false;
+
+        int ncr = 0;
+        int num_cmd = 0;
+
+        char name_cmd[MAX_SIZE_STR] = "VENOM";
+
+        bool read_cmd = sscanf(src_arr_ptr + src_pc, "%s %n", name_cmd, &ncr);
+        if (!read_cmd)
+        {
+            fprintf(stderr, "%s\n", ERROR_TEXT[3]); fprintf(stderr, "file: %s; func: %s; line: %d\n", "../assembler/src/asm.cpp" , __func__ , 295 );;
+            return 3;
+        }
+
+        if (strcmp(name_cmd, "#") == 0)
+        {
+            while(src_arr_ptr[src_pc] != '\n')
+                src_pc++;
+            src_pc++;
+            continue;
+        }
+        else if (name_cmd[0] == ':')
+        {
+            if (pass_num == 1)
+            {
+                arr_lab[0].jmp_id++;
+
+                arr_lab[index_lab].jmp_id = (int)sz_res_arr;
+                strncpy(arr_lab[index_lab].name_lab, name_cmd + 1, MAX_SIZE_STR - 1);
+                index_lab++;
+            }
+            src_pc += (size_t)ncr;
+            continue;
+        }
+        else
+            src_pc += (size_t)ncr;
+
+if (strcmp(name_cmd, "cmd_hlt" + 4) == 0) 
+{
+    check_cmd = true;
+    if (pass_num == 1)
+        sz_res_arr++;
+    else if (pass_num == 2)
+    {
+        create_log_str(log_str, -1, "VENOM");
+        create_log_str(log_str, 1, commands[0] + 4);
+        create_log_str(log_str, 2, my_int_to_string(0, num_str));
+        create_log_str(log_str, 3, "----");
+        create_log_str(log_str, 4, my_int_to_string((int)pc, num_str));
+        fprintf(fp_log, "%s", log_str);
+        create_log_str(log_str, -2, "VENOM");;
+        fprintf(fp_log, "NAME_CMD <%-7s> NUM_CMD <%-2d> " , commands[0] + 4, 0);
+        fprintf(fp_log, "PRM<%-9s> CMD_ID <%lu>\n", "---", pc);
+        printf("name_cmd: %s[%4s]%s", "\033[1;31m", name_cmd, "\033[0m");;
+        printf("%s[%2d]%s\n", "\033[1;35m", 0, "\033[0m");;
+         res_arr_ptr[pc] = (char)0; pc++; 
+    }; 
+}
+
+if (strcmp(name_cmd, "dir_org" + 4) == 0) { check_cmd = true; if (pass_num == 1) { sscanf(src_arr_ptr + src_pc, "%d \n%n", &num_cmd, &ncr); if (((size_t)num_cmd < sz_res_arr) || (num_cmd < 0)) { fprintf(stderr, "%s\n", ERROR_TEXT[7]); fprintf(stderr, "file: %s; func: %s; line: %d\n", "../assembler/src/../../library/instructions_def.h" , __func__ , 2 );; return 7; } sz_res_arr = (size_t)num_cmd; src_pc += (size_t)ncr; } else if (pass_num == 2) { printf("name_cmd: %s[%4s]%s", "\033[1;31m", name_cmd, "\033[0m");; printf("%s[%2d]%s\n", "\033[1;35m", 1, "\033[0m");; sscanf(src_arr_ptr + src_pc, "%d \n%n", &num_cmd, &ncr); if (((size_t)num_cmd < pc + 1) || (num_cmd < 0)) { fprintf(stderr, "%s\n", ERROR_TEXT[7]); fprintf(stderr, "file: %s; func: %s; line: %d\n", "../assembler/src/../../library/instructions_def.h" , __func__ , 2 );; return 7; } for (int i = (int)pc + 1; i < num_cmd; i++) res_arr_ptr[i] = 0; create_log_str(log_str, -1, "VENOM"); create_log_str(log_str, 1, commands[1] + 4); create_log_str(log_str, 2, my_int_to_string(1, num_str)); create_log_str(log_str, 3, my_int_to_string(num_cmd, num_str)); create_log_str(log_str, 4, "----"); fprintf(fp_log, "%s", log_str); create_log_str(log_str, -2, "VENOM");; fprintf(fp_log, "NAME_CMD <%-7s> NUM_CMD <%-2d> " , commands[1] + 4, 1); fprintf(fp_log, "PRM<%-9d> CMD_ID <%s>\n", num_cmd, "---"); pc = (size_t)num_cmd; src_pc += (size_t)ncr; }; }
+if (strcmp(name_cmd, "cmd_push" + 4) == 0) { check_cmd = true; if (pass_num == 1) { if (sscanf(src_arr_ptr + src_pc, "%lf" "\n%n", &num_user, &ncr) == 1) { src_pc += (size_t)ncr; sz_res_arr += 1 + sizeof(num_t); } else { sz_res_arr += 2; src_pc += LEN_NAME_REG + 1; } } else if (pass_num == 2) { fprintf(fp_log, "NAME_CMD <%-7s> NUM_CMD <%-2d> " , commands[2] + 4, 2); printf("name_cmd: %s[%4s]%s", "\033[1;31m", name_cmd, "\033[0m");; printf("%s[%2d]%s\n", "\033[1;35m", 2, "\033[0m");; if (sscanf(src_arr_ptr + src_pc, "%lf" "\n%n", &num_user, &ncr) == 1) { res_arr_ptr[pc] = (char)2; memcpy(res_arr_ptr + pc + 1, &num_user, sizeof(num_t)); create_log_str(log_str, -1, "VENOM"); create_log_str(log_str, 1, commands[2] + 4); create_log_str(log_str, 2, my_int_to_string(2, num_str)); create_log_str(log_str, 3, my_int_to_string((int)num_user, num_str)); create_log_str(log_str, 4, my_int_to_string((int)pc, num_str)); fprintf(fp_log, "%s", log_str); create_log_str(log_str, -2, "VENOM");; fprintf(fp_log, "PRM<" "%-9.2lf" "> CMD_ID <%lu>\n", num_user, pc); pc += 1 + sizeof(num_t); src_pc += (size_t)ncr; } else { sscanf (src_arr_ptr + src_pc, "%s \n%n", name_cmd, &ncr); res_arr_ptr[pc] = (char)(2^64); res_arr_ptr[pc+1] = (char)check_num_reg(name_cmd); if (res_arr_ptr[pc+1] == 5) { fprintf(stderr, "%s\n", ERROR_TEXT[5]); fprintf(stderr, "file: %s; func: %s; line: %d\n", "../assembler/src/../../library/instructions_def.h" , __func__ , 3 );; return 5; } CREATE_LOG_STR; fprintf(fp_log, "PRM<%-9s> CMD_ID <%lu>\n", name_cmd, pc); pc += 2; src_pc += (size_t)ncr; } }; }
+if (strcmp(name_cmd, "cmd_pop" + 4) == 0) { check_cmd = true; if (pass_num == 1) { sz_res_arr += 2; src_pc += LEN_NAME_REG + 1; } else if (pass_num == 2) { printf("name_cmd: %s[%4s]%s", "\033[1;31m", name_cmd, "\033[0m");; printf("%s[%2d]%s\n", "\033[1;35m", 3, "\033[0m");; res_arr_ptr[pc] = 3; sscanf (src_arr_ptr + src_pc, "%s \n%n" , name_cmd, &ncr); res_arr_ptr[pc+1] = (char)check_num_reg(name_cmd); if (res_arr_ptr[pc+1] == 5) { fprintf(stderr, "%s\n", ERROR_TEXT[5]); fprintf(stderr, "file: %s; func: %s; line: %d\n", "../assembler/src/../../library/instructions_def.h" , __func__ , 4 );; return 5; } create_log_str(log_str, -1, "VENOM"); create_log_str(log_str, 1, commands[3] + 4); create_log_str(log_str, 2, my_int_to_string(3, num_str)); create_log_str(log_str, 3, name_cmd); create_log_str(log_str, 4, my_int_to_string((int)pc, num_str)); fprintf(fp_log, "%s", log_str); create_log_str(log_str, -2, "VENOM");; fprintf(fp_log, "NAME_CMD <%-7s> NUM_CMD <%-2d> " , commands[3] + 4, 3); fprintf(fp_log, "PRM<%-9s> CMD_ID <%lu>\n", name_cmd, pc); pc += 2; src_pc += (size_t)ncr;; }
+if (strcmp(name_cmd, "cmd_in" + 4) == 0) { check_cmd = true; if (pass_num == 1) sz_res_arr++; else if (pass_num == 2) { create_log_str(log_str, -1, "VENOM"); create_log_str(log_str, 1, commands[4] + 4); create_log_str(log_str, 2, my_int_to_string(4, num_str)); create_log_str(log_str, 3, "----"); create_log_str(log_str, 4, my_int_to_string((int)pc, num_str)); fprintf(fp_log, "%s", log_str); create_log_str(log_str, -2, "VENOM");; fprintf(fp_log, "NAME_CMD <%-7s> NUM_CMD <%-2d> " , commands[4] + 4, 4); fprintf(fp_log, "PRM<%-9s> CMD_ID <%lu>\n", "---", pc); printf("name_cmd: %s[%4s]%s", "\033[1;31m", name_cmd, "\033[0m");; printf("%s[%2d]%s\n", "\033[1;35m", 4, "\033[0m");; res_arr_ptr[pc] = (char)4; pc++; }; }
+if (strcmp(name_cmd, "cmd_sqrt" + 4) == 0) { check_cmd = true; if (pass_num == 1) sz_res_arr++; else if (pass_num == 2) { create_log_str(log_str, -1, "VENOM"); create_log_str(log_str, 1, commands[5] + 4); create_log_str(log_str, 2, my_int_to_string(5, num_str)); create_log_str(log_str, 3, "----"); create_log_str(log_str, 4, my_int_to_string((int)pc, num_str)); fprintf(fp_log, "%s", log_str); create_log_str(log_str, -2, "VENOM");; fprintf(fp_log, "NAME_CMD <%-7s> NUM_CMD <%-2d> " , commands[5] + 4, 5); fprintf(fp_log, "PRM<%-9s> CMD_ID <%lu>\n", "---", pc); printf("name_cmd: %s[%4s]%s", "\033[1;31m", name_cmd, "\033[0m");; printf("%s[%2d]%s\n", "\033[1;35m", 5, "\033[0m");; res_arr_ptr[pc] = (char)5; pc++; }; }
+if (strcmp(name_cmd, "cmd_sin" + 4) == 0) { check_cmd = true; if (pass_num == 1) sz_res_arr++; else if (pass_num == 2) { create_log_str(log_str, -1, "VENOM"); create_log_str(log_str, 1, commands[6] + 4); create_log_str(log_str, 2, my_int_to_string(6, num_str)); create_log_str(log_str, 3, "----"); create_log_str(log_str, 4, my_int_to_string((int)pc, num_str)); fprintf(fp_log, "%s", log_str); create_log_str(log_str, -2, "VENOM");; fprintf(fp_log, "NAME_CMD <%-7s> NUM_CMD <%-2d> " , commands[6] + 4, 6); fprintf(fp_log, "PRM<%-9s> CMD_ID <%lu>\n", "---", pc); printf("name_cmd: %s[%4s]%s", "\033[1;31m", name_cmd, "\033[0m");; printf("%s[%2d]%s\n", "\033[1;35m", 6, "\033[0m");; res_arr_ptr[pc] = (char)6; pc++; }; }
+if (strcmp(name_cmd, "cmd_cos" + 4) == 0) { check_cmd = true; if (pass_num == 1) sz_res_arr++; else if (pass_num == 2) { create_log_str(log_str, -1, "VENOM"); create_log_str(log_str, 1, commands[7] + 4); create_log_str(log_str, 2, my_int_to_string(7, num_str)); create_log_str(log_str, 3, "----"); create_log_str(log_str, 4, my_int_to_string((int)pc, num_str)); fprintf(fp_log, "%s", log_str); create_log_str(log_str, -2, "VENOM");; fprintf(fp_log, "NAME_CMD <%-7s> NUM_CMD <%-2d> " , commands[7] + 4, 7); fprintf(fp_log, "PRM<%-9s> CMD_ID <%lu>\n", "---", pc); printf("name_cmd: %s[%4s]%s", "\033[1;31m", name_cmd, "\033[0m");; printf("%s[%2d]%s\n", "\033[1;35m", 7, "\033[0m");; res_arr_ptr[pc] = (char)7; pc++; }; }
+if (strcmp(name_cmd, "cmd_add" + 4) == 0) { check_cmd = true; if (pass_num == 1) sz_res_arr++; else if (pass_num == 2) { create_log_str(log_str, -1, "VENOM"); create_log_str(log_str, 1, commands[8] + 4); create_log_str(log_str, 2, my_int_to_string(8, num_str)); create_log_str(log_str, 3, "----"); create_log_str(log_str, 4, my_int_to_string((int)pc, num_str)); fprintf(fp_log, "%s", log_str); create_log_str(log_str, -2, "VENOM");; fprintf(fp_log, "NAME_CMD <%-7s> NUM_CMD <%-2d> " , commands[8] + 4, 8); fprintf(fp_log, "PRM<%-9s> CMD_ID <%lu>\n", "---", pc); printf("name_cmd: %s[%4s]%s", "\033[1;31m", name_cmd, "\033[0m");; printf("%s[%2d]%s\n", "\033[1;35m", 8, "\033[0m");; res_arr_ptr[pc] = (char)8; pc++; }; }
+if (strcmp(name_cmd, "cmd_sub" + 4) == 0) { check_cmd = true; if (pass_num == 1) sz_res_arr++; else if (pass_num == 2) { create_log_str(log_str, -1, "VENOM"); create_log_str(log_str, 1, commands[9] + 4); create_log_str(log_str, 2, my_int_to_string(9, num_str)); create_log_str(log_str, 3, "----"); create_log_str(log_str, 4, my_int_to_string((int)pc, num_str)); fprintf(fp_log, "%s", log_str); create_log_str(log_str, -2, "VENOM");; fprintf(fp_log, "NAME_CMD <%-7s> NUM_CMD <%-2d> " , commands[9] + 4, 9); fprintf(fp_log, "PRM<%-9s> CMD_ID <%lu>\n", "---", pc); printf("name_cmd: %s[%4s]%s", "\033[1;31m", name_cmd, "\033[0m");; printf("%s[%2d]%s\n", "\033[1;35m", 9, "\033[0m");; res_arr_ptr[pc] = (char)9; pc++; }; }
+if (strcmp(name_cmd, "cmd_mul" + 4) == 0) { check_cmd = true; if (pass_num == 1) sz_res_arr++; else if (pass_num == 2) { create_log_str(log_str, -1, "VENOM"); create_log_str(log_str, 1, commands[10] + 4); create_log_str(log_str, 2, my_int_to_string(10, num_str)); create_log_str(log_str, 3, "----"); create_log_str(log_str, 4, my_int_to_string((int)pc, num_str)); fprintf(fp_log, "%s", log_str); create_log_str(log_str, -2, "VENOM");; fprintf(fp_log, "NAME_CMD <%-7s> NUM_CMD <%-2d> " , commands[10] + 4, 10); fprintf(fp_log, "PRM<%-9s> CMD_ID <%lu>\n", "---", pc); printf("name_cmd: %s[%4s]%s", "\033[1;31m", name_cmd, "\033[0m");; printf("%s[%2d]%s\n", "\033[1;35m", 10, "\033[0m");; res_arr_ptr[pc] = (char)10; pc++; }; }
+if (strcmp(name_cmd, "cmd_div" + 4) == 0) { check_cmd = true; if (pass_num == 1) sz_res_arr++; else if (pass_num == 2) { create_log_str(log_str, -1, "VENOM"); create_log_str(log_str, 1, commands[11] + 4); create_log_str(log_str, 2, my_int_to_string(11, num_str)); create_log_str(log_str, 3, "----"); create_log_str(log_str, 4, my_int_to_string((int)pc, num_str)); fprintf(fp_log, "%s", log_str); create_log_str(log_str, -2, "VENOM");; fprintf(fp_log, "NAME_CMD <%-7s> NUM_CMD <%-2d> " , commands[11] + 4, 11); fprintf(fp_log, "PRM<%-9s> CMD_ID <%lu>\n", "---", pc); printf("name_cmd: %s[%4s]%s", "\033[1;31m", name_cmd, "\033[0m");; printf("%s[%2d]%s\n", "\033[1;35m", 11, "\033[0m");; res_arr_ptr[pc] = (char)11; pc++; }; }
+if (strcmp(name_cmd, "cmd_jmp" + 4) == 0) { check_cmd = true; if (pass_num == 1) { if (sscanf(src_arr_ptr + src_pc, "%d \n%n", &num_cmd, &ncr) != 1) sscanf(src_arr_ptr + src_pc, "%s \n%n", name_cmd, &ncr); sz_res_arr += 1 + sizeof(int); src_pc += (size_t)ncr; } else if (pass_num == 2) { printf("name_cmd: %s[%4s]%s", "\033[1;31m", name_cmd, "\033[0m");; printf("%s[%2d]%s\n", "\033[1;35m", 12, "\033[0m");; res_arr_ptr[pc] = 12; if (sscanf(src_arr_ptr + src_pc, "%d \n%n", &num_cmd, &ncr) != 1) { sscanf(src_arr_ptr + src_pc, "%s \n%n", name_cmd, &ncr); for (int i = 1; i <= arr_lab[0].jmp_id; i++) { if (!strcmp(arr_lab[i].name_lab, name_cmd)) { num_cmd = arr_lab[i].jmp_id; break; } } } memcpy(res_arr_ptr + pc + 1, &num_cmd, sizeof(int)); create_log_str(log_str, -1, "VENOM"); create_log_str(log_str, 1, commands[12] + 4); create_log_str(log_str, 2, my_int_to_string(12, num_str)); create_log_str(log_str, 3, my_int_to_string(num_cmd, num_str)); create_log_str(log_str, 4, my_int_to_string((int)pc, num_str)); fprintf(fp_log, "%s", log_str); create_log_str(log_str, -2, "VENOM");; fprintf(fp_log, "NAME_CMD <%-7s> NUM_CMD <%-2d> " , commands[12] + 4, 12); fprintf(fp_log, "PRM<%-9d> CMD_ID <%lu>\n", num_cmd, pc); pc += 1 + sizeof(int); src_pc += (size_t)ncr; }; }
+if (strcmp(name_cmd, "cmd_jb" + 4) == 0) { check_cmd = true; if (pass_num == 1) { if (sscanf(src_arr_ptr + src_pc, "%d \n%n", &num_cmd, &ncr) != 1) sscanf(src_arr_ptr + src_pc, "%s \n%n", name_cmd, &ncr); sz_res_arr += 1 + sizeof(int); src_pc += (size_t)ncr; } else if (pass_num == 2) { printf("name_cmd: %s[%4s]%s", "\033[1;31m", name_cmd, "\033[0m");; printf("%s[%2d]%s\n", "\033[1;35m", 13, "\033[0m");; res_arr_ptr[pc] = 13; if (sscanf(src_arr_ptr + src_pc, "%d \n%n", &num_cmd, &ncr) != 1) { sscanf(src_arr_ptr + src_pc, "%s \n%n", name_cmd, &ncr); for (int i = 1; i <= arr_lab[0].jmp_id; i++) { if (!strcmp(arr_lab[i].name_lab, name_cmd)) { num_cmd = arr_lab[i].jmp_id; break; } } } memcpy(res_arr_ptr + pc + 1, &num_cmd, sizeof(int)); create_log_str(log_str, -1, "VENOM"); create_log_str(log_str, 1, commands[13] + 4); create_log_str(log_str, 2, my_int_to_string(13, num_str)); create_log_str(log_str, 3, my_int_to_string(num_cmd, num_str)); create_log_str(log_str, 4, my_int_to_string((int)pc, num_str)); fprintf(fp_log, "%s", log_str); create_log_str(log_str, -2, "VENOM");; fprintf(fp_log, "NAME_CMD <%-7s> NUM_CMD <%-2d> " , commands[13] + 4, 13); fprintf(fp_log, "PRM<%-9d> CMD_ID <%lu>\n", num_cmd, pc); pc += 1 + sizeof(int); src_pc += (size_t)ncr; }; }
+if (strcmp(name_cmd, "cmd_jbe" + 4) == 0) { check_cmd = true; if (pass_num == 1) { if (sscanf(src_arr_ptr + src_pc, "%d \n%n", &num_cmd, &ncr) != 1) sscanf(src_arr_ptr + src_pc, "%s \n%n", name_cmd, &ncr); sz_res_arr += 1 + sizeof(int); src_pc += (size_t)ncr; } else if (pass_num == 2) { printf("name_cmd: %s[%4s]%s", "\033[1;31m", name_cmd, "\033[0m");; printf("%s[%2d]%s\n", "\033[1;35m", 14, "\033[0m");; res_arr_ptr[pc] = 14; if (sscanf(src_arr_ptr + src_pc, "%d \n%n", &num_cmd, &ncr) != 1) { sscanf(src_arr_ptr + src_pc, "%s \n%n", name_cmd, &ncr); for (int i = 1; i <= arr_lab[0].jmp_id; i++) { if (!strcmp(arr_lab[i].name_lab, name_cmd)) { num_cmd = arr_lab[i].jmp_id; break; } } } memcpy(res_arr_ptr + pc + 1, &num_cmd, sizeof(int)); create_log_str(log_str, -1, "VENOM"); create_log_str(log_str, 1, commands[14] + 4); create_log_str(log_str, 2, my_int_to_string(14, num_str)); create_log_str(log_str, 3, my_int_to_string(num_cmd, num_str)); create_log_str(log_str, 4, my_int_to_string((int)pc, num_str)); fprintf(fp_log, "%s", log_str); create_log_str(log_str, -2, "VENOM");; fprintf(fp_log, "NAME_CMD <%-7s> NUM_CMD <%-2d> " , commands[14] + 4, 14); fprintf(fp_log, "PRM<%-9d> CMD_ID <%lu>\n", num_cmd, pc); pc += 1 + sizeof(int); src_pc += (size_t)ncr; }; }
+if (strcmp(name_cmd, "cmd_ja" + 4) == 0) { check_cmd = true; if (pass_num == 1) { if (sscanf(src_arr_ptr + src_pc, "%d \n%n", &num_cmd, &ncr) != 1) sscanf(src_arr_ptr + src_pc, "%s \n%n", name_cmd, &ncr); sz_res_arr += 1 + sizeof(int); src_pc += (size_t)ncr; } else if (pass_num == 2) { printf("name_cmd: %s[%4s]%s", "\033[1;31m", name_cmd, "\033[0m");; printf("%s[%2d]%s\n", "\033[1;35m", 15, "\033[0m");; res_arr_ptr[pc] = 15; if (sscanf(src_arr_ptr + src_pc, "%d \n%n", &num_cmd, &ncr) != 1) { sscanf(src_arr_ptr + src_pc, "%s \n%n", name_cmd, &ncr); for (int i = 1; i <= arr_lab[0].jmp_id; i++) { if (!strcmp(arr_lab[i].name_lab, name_cmd)) { num_cmd = arr_lab[i].jmp_id; break; } } } memcpy(res_arr_ptr + pc + 1, &num_cmd, sizeof(int)); create_log_str(log_str, -1, "VENOM"); create_log_str(log_str, 1, commands[15] + 4); create_log_str(log_str, 2, my_int_to_string(15, num_str)); create_log_str(log_str, 3, my_int_to_string(num_cmd, num_str)); create_log_str(log_str, 4, my_int_to_string((int)pc, num_str)); fprintf(fp_log, "%s", log_str); create_log_str(log_str, -2, "VENOM");; fprintf(fp_log, "NAME_CMD <%-7s> NUM_CMD <%-2d> " , commands[15] + 4, 15); fprintf(fp_log, "PRM<%-9d> CMD_ID <%lu>\n", num_cmd, pc); pc += 1 + sizeof(int); src_pc += (size_t)ncr; }; }
+if (strcmp(name_cmd, "cmd_jae" + 4) == 0) { check_cmd = true; if (pass_num == 1) { if (sscanf(src_arr_ptr + src_pc, "%d \n%n", &num_cmd, &ncr) != 1) sscanf(src_arr_ptr + src_pc, "%s \n%n", name_cmd, &ncr); sz_res_arr += 1 + sizeof(int); src_pc += (size_t)ncr; } else if (pass_num == 2) { printf("name_cmd: %s[%4s]%s", "\033[1;31m", name_cmd, "\033[0m");; printf("%s[%2d]%s\n", "\033[1;35m", 16, "\033[0m");; res_arr_ptr[pc] = 16; if (sscanf(src_arr_ptr + src_pc, "%d \n%n", &num_cmd, &ncr) != 1) { sscanf(src_arr_ptr + src_pc, "%s \n%n", name_cmd, &ncr); for (int i = 1; i <= arr_lab[0].jmp_id; i++) { if (!strcmp(arr_lab[i].name_lab, name_cmd)) { num_cmd = arr_lab[i].jmp_id; break; } } } memcpy(res_arr_ptr + pc + 1, &num_cmd, sizeof(int)); create_log_str(log_str, -1, "VENOM"); create_log_str(log_str, 1, commands[16] + 4); create_log_str(log_str, 2, my_int_to_string(16, num_str)); create_log_str(log_str, 3, my_int_to_string(num_cmd, num_str)); create_log_str(log_str, 4, my_int_to_string((int)pc, num_str)); fprintf(fp_log, "%s", log_str); create_log_str(log_str, -2, "VENOM");; fprintf(fp_log, "NAME_CMD <%-7s> NUM_CMD <%-2d> " , commands[16] + 4, 16); fprintf(fp_log, "PRM<%-9d> CMD_ID <%lu>\n", num_cmd, pc); pc += 1 + sizeof(int); src_pc += (size_t)ncr; }; }
+if (strcmp(name_cmd, "cmd_je" + 4) == 0) { check_cmd = true; if (pass_num == 1) { if (sscanf(src_arr_ptr + src_pc, "%d \n%n", &num_cmd, &ncr) != 1) sscanf(src_arr_ptr + src_pc, "%s \n%n", name_cmd, &ncr); sz_res_arr += 1 + sizeof(int); src_pc += (size_t)ncr; } else if (pass_num == 2) { printf("name_cmd: %s[%4s]%s", "\033[1;31m", name_cmd, "\033[0m");; printf("%s[%2d]%s\n", "\033[1;35m", 17, "\033[0m");; res_arr_ptr[pc] = 17; if (sscanf(src_arr_ptr + src_pc, "%d \n%n", &num_cmd, &ncr) != 1) { sscanf(src_arr_ptr + src_pc, "%s \n%n", name_cmd, &ncr); for (int i = 1; i <= arr_lab[0].jmp_id; i++) { if (!strcmp(arr_lab[i].name_lab, name_cmd)) { num_cmd = arr_lab[i].jmp_id; break; } } } memcpy(res_arr_ptr + pc + 1, &num_cmd, sizeof(int)); create_log_str(log_str, -1, "VENOM"); create_log_str(log_str, 1, commands[17] + 4); create_log_str(log_str, 2, my_int_to_string(17, num_str)); create_log_str(log_str, 3, my_int_to_string(num_cmd, num_str)); create_log_str(log_str, 4, my_int_to_string((int)pc, num_str)); fprintf(fp_log, "%s", log_str); create_log_str(log_str, -2, "VENOM");; fprintf(fp_log, "NAME_CMD <%-7s> NUM_CMD <%-2d> " , commands[17] + 4, 17); fprintf(fp_log, "PRM<%-9d> CMD_ID <%lu>\n", num_cmd, pc); pc += 1 + sizeof(int); src_pc += (size_t)ncr; }; }
+if (strcmp(name_cmd, "cmd_jne" + 4) == 0) { check_cmd = true; if (pass_num == 1) { if (sscanf(src_arr_ptr + src_pc, "%d \n%n", &num_cmd, &ncr) != 1) sscanf(src_arr_ptr + src_pc, "%s \n%n", name_cmd, &ncr); sz_res_arr += 1 + sizeof(int); src_pc += (size_t)ncr; } else if (pass_num == 2) { printf("name_cmd: %s[%4s]%s", "\033[1;31m", name_cmd, "\033[0m");; printf("%s[%2d]%s\n", "\033[1;35m", 18, "\033[0m");; res_arr_ptr[pc] = 18; if (sscanf(src_arr_ptr + src_pc, "%d \n%n", &num_cmd, &ncr) != 1) { sscanf(src_arr_ptr + src_pc, "%s \n%n", name_cmd, &ncr); for (int i = 1; i <= arr_lab[0].jmp_id; i++) { if (!strcmp(arr_lab[i].name_lab, name_cmd)) { num_cmd = arr_lab[i].jmp_id; break; } } } memcpy(res_arr_ptr + pc + 1, &num_cmd, sizeof(int)); create_log_str(log_str, -1, "VENOM"); create_log_str(log_str, 1, commands[18] + 4); create_log_str(log_str, 2, my_int_to_string(18, num_str)); create_log_str(log_str, 3, my_int_to_string(num_cmd, num_str)); create_log_str(log_str, 4, my_int_to_string((int)pc, num_str)); fprintf(fp_log, "%s", log_str); create_log_str(log_str, -2, "VENOM");; fprintf(fp_log, "NAME_CMD <%-7s> NUM_CMD <%-2d> " , commands[18] + 4, 18); fprintf(fp_log, "PRM<%-9d> CMD_ID <%lu>\n", num_cmd, pc); pc += 1 + sizeof(int); src_pc += (size_t)ncr; }; }
+if (strcmp(name_cmd, "cmd_call" + 4) == 0) { check_cmd = true; if (pass_num == 1) { if (sscanf(src_arr_ptr + src_pc, "%d \n%n", &num_cmd, &ncr) != 1) sscanf(src_arr_ptr + src_pc, "%s \n%n", name_cmd, &ncr); sz_res_arr += 1 + sizeof(int); src_pc += (size_t)ncr; } else if (pass_num == 2) { printf("name_cmd: %s[%4s]%s", "\033[1;31m", name_cmd, "\033[0m");; printf("%s[%2d]%s\n", "\033[1;35m", 19, "\033[0m");; res_arr_ptr[pc] = 19; if (sscanf(src_arr_ptr + src_pc, "%d \n%n", &num_cmd, &ncr) != 1) { sscanf(src_arr_ptr + src_pc, "%s \n%n", name_cmd, &ncr); for (int i = 1; i <= arr_lab[0].jmp_id; i++) { if (!strcmp(arr_lab[i].name_lab, name_cmd)) { num_cmd = arr_lab[i].jmp_id; break; } } } memcpy(res_arr_ptr + pc + 1, &num_cmd, sizeof(int)); create_log_str(log_str, -1, "VENOM"); create_log_str(log_str, 1, commands[19] + 4); create_log_str(log_str, 2, my_int_to_string(19, num_str)); create_log_str(log_str, 3, my_int_to_string(num_cmd, num_str)); create_log_str(log_str, 4, my_int_to_string((int)pc, num_str)); fprintf(fp_log, "%s", log_str); create_log_str(log_str, -2, "VENOM");; fprintf(fp_log, "NAME_CMD <%-7s> NUM_CMD <%-2d> " , commands[19] + 4, 19); fprintf(fp_log, "PRM<%-9d> CMD_ID <%lu>\n", num_cmd, pc); pc += 1 + sizeof(int); src_pc += (size_t)ncr; }; }
+if (strcmp(name_cmd, "cmd_ret" + 4) == 0) { check_cmd = true; if (pass_num == 1) sz_res_arr++; else if (pass_num == 2) { create_log_str(log_str, -1, "VENOM"); create_log_str(log_str, 1, commands[20] + 4); create_log_str(log_str, 2, my_int_to_string(20, num_str)); create_log_str(log_str, 3, "----"); create_log_str(log_str, 4, my_int_to_string((int)pc, num_str)); fprintf(fp_log, "%s", log_str); create_log_str(log_str, -2, "VENOM");; fprintf(fp_log, "NAME_CMD <%-7s> NUM_CMD <%-2d> " , commands[20] + 4, 20); fprintf(fp_log, "PRM<%-9s> CMD_ID <%lu>\n", "---", pc); printf("name_cmd: %s[%4s]%s", "\033[1;31m", name_cmd, "\033[0m");; printf("%s[%2d]%s\n", "\033[1;35m", 20, "\033[0m");; res_arr_ptr[pc] = (char)20; pc++; }; }
+if (strcmp(name_cmd, "cmd_out" + 4) == 0) { check_cmd = true; if (pass_num == 1) sz_res_arr++; else if (pass_num == 2) { create_log_str(log_str, -1, "VENOM"); create_log_str(log_str, 1, commands[21] + 4); create_log_str(log_str, 2, my_int_to_string(21, num_str)); create_log_str(log_str, 3, "----"); create_log_str(log_str, 4, my_int_to_string((int)pc, num_str)); fprintf(fp_log, "%s", log_str); create_log_str(log_str, -2, "VENOM");; fprintf(fp_log, "NAME_CMD <%-7s> NUM_CMD <%-2d> " , commands[21] + 4, 21); fprintf(fp_log, "PRM<%-9s> CMD_ID <%lu>\n", "---", pc); printf("name_cmd: %s[%4s]%s", "\033[1;31m", name_cmd, "\033[0m");; printf("%s[%2d]%s\n", "\033[1;35m", 21, "\033[0m");; res_arr_ptr[pc] = (char)21; pc++; }; }
+# 323 "../assembler/src/asm.cpp" 2
+
+        if (!check_cmd)
+        {
+            fprintf(stderr, "%s\n", ERROR_TEXT[4]); fprintf(stderr, "file: %s; func: %s; line: %d\n", "../assembler/src/asm.cpp" , __func__ , 326 );;
+            return 4;
+        }
+    }
+
+    if (pass_num == 1)
+    {
+        res_struct_arr->size_arr = sz_res_arr;
+        res_struct_arr->arr_ptr = (char*)calloc(sz_res_arr + 2, sizeof(char));
+    }
+
+
+
+    return 0;
+}
+
+int check_num_reg(const char *str)
+{
+    switch(str[1])
+    {
+        case 'a':
+            return rax;
+        case 'b':
+            return rbx;
+        case 'c':
+            return rcx;
+        case 'd':
+            return rdx;
+        default:
+            return 5;
+    }
+}

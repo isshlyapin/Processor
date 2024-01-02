@@ -1,7 +1,7 @@
 #ifndef CONFIG_H
 #define CONFIG_H
 
-#include <stdio.h>
+// #include <stdio.h>
 
 static const size_t STD_STACK_CAP = 10;
 static const size_t MAX_SIZE_STR  = 100;
@@ -21,6 +21,6 @@ typedef double num_t;
 
 #define PRINT_ERROR(str ...)                                                            \
     fprintf(stderr, str);                                                               \
-    fprintf(stderr, "file: %s; func: %s; line: %d\n", __FILE__ , __func__ , __LINE__ ); \
+    fprintf(stderr, "file: %s; func: %s; line: %d\n", __FILE__, __func__ ,__LINE__);
 
 #endif //! CONFIG_H

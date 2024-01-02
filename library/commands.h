@@ -1,7 +1,7 @@
 #ifndef COMMANDS_H
 #define COMMANDS_H 
 
-#include <stdio.h>
+// #include <stdio.h>
 
 #define NEW_INSTRUCTIONS(name, num, ...) name = num,
 

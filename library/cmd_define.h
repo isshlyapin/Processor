@@ -7,9 +7,9 @@
         sz_res_arr++;                                                                            \
     else if (pass_num == 2)                                                                      \
     {                                                                                            \
-        CREATE_LOG_STR(commands[num] + 4, my_int_to_string(num, num_str), "----", my_int_to_string((int)pc, num_str)); \
-        PRINT_LOG("NAME_CMD <%-7s> NUM_CMD <%-2d> " , commands[num] + 4, num);                   \
-        PRINT_LOG("PRM<%-9s> CMD_ID <%lu>\n", "---", pc);                                        \
+        tmp1 = num;\
+        tmp2 = (int)pc;\
+        CREATE_LOG_STR(commands[num] + 4, itoa(&tmp1, num_str, 'd'), "----", itoa(&tmp2, num_str, 'd')); \
                                                                                                  \
         PRINT_INFO("name_cmd: %s[%4s]%s", RED, name_cmd, RESET);                                 \
         PRINT_INFO("%s[%2d]%s\n", MAGENTA, num, RESET);                                          \
@@ -34,7 +34,6 @@
     }                                                                                            \
     else if (pass_num == 2)                                                                      \
     {                                                                                            \
-        PRINT_LOG("NAME_CMD <%-7s> NUM_CMD <%-2d> " , commands[num] + 4, num);                   \
                                                                                                  \
         PRINT_INFO("name_cmd: %s[%4s]%s", RED, name_cmd, RESET);                                 \
         PRINT_INFO("%s[%2d]%s\n", MAGENTA, num, RESET);                                          \
@@ -43,9 +42,9 @@
         {                                                                                        \
             res_arr_ptr[pc] = (char)num;                                                         \
             memcpy(res_arr_ptr + pc + 1, &num_user, sizeof(num_t));                              \
-            CREATE_LOG_STR(commands[num] + 4, my_int_to_string(num, num_str), my_int_to_string((int)num_user, num_str), my_int_to_string((int)pc, num_str)); \
-                                                                                                 \
-            PRINT_LOG("PRM<" NUM_MOD_PRINT "> CMD_ID <%lu>\n", num_user, pc);                    \
+            tmp1 = num;\
+            tmp2 = (int)pc;\
+            CREATE_LOG_STR(commands[num] + 4, itoa(&tmp1, num_str, 'd'), itoa(&num_user, num_str, 'f'), itoa(&tmp2, num_str, 'd')); \
                                                                                                  \
             pc     += 1 + sizeof(num_t);                                                         \
             src_pc += (size_t)ncr;                                                               \
@@ -62,8 +61,9 @@
                 return ошибка_в_имени_регистра;                                                  \
             }                                                                                    \
                                                                                                  \
-            CREATE_LOG_STR(commands[num] + 4, my_int_to_string(num, num_str). name_cmd, my_int_to_string((int)pc, num_str)); \
-            PRINT_LOG("PRM<%-9s> CMD_ID <%lu>\n", name_cmd, pc);                                 \
+            tmp1 = num;\
+            tmp2 = (int)pc;\
+            CREATE_LOG_STR(commands[num] + 4, itoa(&tmp1, num_str, 'd'), name_cmd, itoa(&tmp2, num_str, 'd')); \
                                                                                                  \
             pc     += 2;                                                                         \
             src_pc += (size_t)ncr;                                                               \
@@ -93,13 +93,14 @@
             return ошибка_в_имени_регистра;                                                       \
         }                                                                                         \
                                                                                                   \
-        CREATE_LOG_STR(commands[num] + 4, my_int_to_string(num, num_str), name_cmd, my_int_to_string((int)pc, num_str)); \
-        PRINT_LOG("NAME_CMD <%-7s> NUM_CMD <%-2d> " , commands[num] + 4, num);                    \
-        PRINT_LOG("PRM<%-9s> CMD_ID <%lu>\n", name_cmd, pc);                                      \
+        tmp1 = num;\
+        tmp2 = (int)pc;\
+        CREATE_LOG_STR(commands[num] + 4, itoa(&tmp1, num_str, 'd'), name_cmd, itoa(&tmp2, num_str, 'd')); \
                                                                                                   \
         pc     += 2;                                                                              \
         src_pc += (size_t)ncr;                                                                    \
-
+    }
+        
 #define ASM_JMP_and_CALL(pass_num, num)                                                           \
     if (pass_num == 1)                                                                            \
     {                                                                                             \
@@ -130,9 +131,9 @@
         }                                                                                         \
         memcpy(res_arr_ptr + pc + 1, &num_cmd, sizeof(int));                                      \
                                                                                                   \
-        CREATE_LOG_STR(commands[num] + 4, my_int_to_string(num, num_str), my_int_to_string(num_cmd, num_str), my_int_to_string((int)pc, num_str)); \
-        PRINT_LOG("NAME_CMD <%-7s> NUM_CMD <%-2d> " , commands[num] + 4, num);                    \
-        PRINT_LOG("PRM<%-9d> CMD_ID <%lu>\n", num_cmd, pc);                                       \
+        tmp1 = num;\
+        tmp2 = (int)pc;\
+        CREATE_LOG_STR(commands[num] + 4, itoa(&tmp1, num_str, 'd'), itoa(&num_cmd, num_str, 'd'), itoa(&tmp2, num_str, 'd')); \
                                                                                                   \
         pc     += 1 + sizeof(int);                                                                \
         src_pc += (size_t)ncr;                                                                    \
@@ -168,9 +169,8 @@
         for (int i = (int)pc + 1; i < num_cmd; i++)                                               \
             res_arr_ptr[i] = 0;                                                                   \
                                                                                                   \
-        CREATE_LOG_STR(commands[num] + 4, my_int_to_string(num, num_str), my_int_to_string(num_cmd, num_str), "----"); \
-        PRINT_LOG("NAME_CMD <%-7s> NUM_CMD <%-2d> " , commands[num] + 4, num);                    \
-        PRINT_LOG("PRM<%-9d> CMD_ID <%s>\n", num_cmd, "---");                                     \
+        tmp1 = num;\
+        CREATE_LOG_STR(commands[num] + 4, itoa(&tmp1, num_str, 'd'), itoa(&num_cmd, num_str, 'd'), "----"); \
                                                                                                   \
         pc = (size_t)num_cmd;                                                                     \
         src_pc += (size_t)ncr;                                                                    \

@@ -1,80 +1,4 @@
 #include "../include/asm.h"
-#include <stdlib.h>
-#include <iostream>
-#include <string>
-
-#define CREATE_LOG_STR(first_col, second_col, third_col, fourth_col)                            \
-    create_log_str(log_str, -1, "VENOM");                                                       \
-    create_log_str(log_str, 1, first_col);                                                      \
-    create_log_str(log_str, 2, second_col);                                                     \
-    create_log_str(log_str, 3, third_col);                                                      \
-    create_log_str(log_str, 4, fourth_col);                                                     \
-    PRINT_LOG("%s", log_str);                                                                   \
-    create_log_str(log_str, -2, "VENOM"); 
-
-#define PRINT_PARTITION()                    \
-    for (int i = 0; i < LEN_LOG_STR; i++)    \
-    {                                        \
-        if ((i == 0) || (i == FIVE_COLUM))   \
-            str[i] = '|';                    \
-        else if ( i == (LEN_LOG_STR - 2))    \
-            str[i] = '\n';                   \
-        else if (i == (LEN_LOG_STR - 1))     \
-            str[i] = '\0';                   \
-        else                                 \
-            str[i] = '-';                    \
-    }                                        \
-    PRINT_LOG("%s", str);
-
-#define PRINT_TITLE_DATE()                                      \
-    for (int i = 0; i < LEN_LOG_STR; i++)                       \
-    {                                                           \
-        if ((i == 0) || (i == FIVE_COLUM))                      \
-            str[i] = '|';                                       \
-        else if ( i == (LEN_LOG_STR - 2))                       \
-            str[i] = '\n';                                      \
-        else if (i == (LEN_LOG_STR - 1))                        \
-            str[i] = '\0';                                      \
-        else                                                    \
-            str[i] = ' ';                                       \
-    }                                                           \
-    int j = 0, k = 0;                                           \
-    while (__DATE__[j] != '\0')                                 \
-    {                                                           \
-        str[((LEN_LOG_STR - 19) / 2) + j] = __DATE__[j];        \
-        j++;                                                    \
-    }                                                           \
-    while (__TIME__[k] != '\0')                                 \
-    {                                                           \
-        str[((LEN_LOG_STR - 19) / 2) + j + 1] = __TIME__[k];    \
-        j++;                                                    \
-        k++;                                                    \
-    }                                                           \
-    PRINT_LOG("%s", str);
-
-#define CREATE_SAMPLE()                                                                                    \
-    for (int i = 0; i < LEN_LOG_STR; i++)                                                                  \
-    {                                                                                                      \
-        if ((i == 0) || (i == TWO_COLUM) || (i == THREE_COLUM) || (i == FOUR_COLUM) || (i == FIVE_COLUM))  \
-            str[i] = '|';                                                                                  \
-        else if (i == (LEN_LOG_STR - 2))                                                                   \
-            str[i] = '\n';                                                                                 \
-        else if (i == (LEN_LOG_STR - 1))                                                                   \
-            str[i] = '\0';                                                                                 \
-        else                                                                                               \
-            str[i] = ' ';                                                                                  \
-    }   
-
-#define PRINT_TITLE()                               \
-    for (int i = 0; "Name cmd"[i] != '\0'; i++)     \
-        str[5 + i] = "Name cmd"[i];                 \
-    for (int i = 0; "Num cmd"[i] != '\0'; i++)      \
-        str[TWO_COLUM + 5 + i] = "Num cmd"[i];      \
-    for (int i = 0; "Parameter"[i] != '\0'; i++)    \
-        str[THREE_COLUM + 5 + i] = "Parameter"[i];  \
-    for (int i = 0; "CMD ID"[i] != '\0'; i++)       \
-        str[FOUR_COLUM + 5 + i] = "CMD ID"[i];      \
-    PRINT_LOG("%s", str);
 
 int main(int argc, char *argv[])
 {
@@ -82,7 +6,7 @@ int main(int argc, char *argv[])
         CHECK_ARGC(argc, 4);
     #else
         CHECK_ARGC(argc, 3);
-    #endif //! LOG
+    #endif
 
     PRINT_INFO("\n___%sWORKING ASSEMBLER%s___\n\n", RED, RESET);
 
@@ -107,9 +31,11 @@ int create_byte_code(FILE *fp_src, FILE *fp_res)
     assert(fp_res != NULL);
     assert(fp_src != NULL);
 
+#ifdef LOG
     char log_str[LEN_LOG_STR] = {};
-    create_log_str(log_str, 0, "VENOM");
-    
+    create_log_str(log_str, TITLE_FLAG, "VENOM");
+#endif
+
     struct Array *src_struct_arr = ctor_struct_arr(fp_src);
     
     assert(src_struct_arr != NULL);
@@ -125,11 +51,12 @@ int create_byte_code(FILE *fp_src, FILE *fp_res)
 
     res_struct_arr->arr_ptr[res_struct_arr->size_arr] = (char)cmd_hlt;
     
-    char num_str[30] = {};
-    CREATE_LOG_STR(commands[cmd_hlt] + 4, my_int_to_string(cmd_hlt, num_str), "----", my_int_to_string((int)res_struct_arr->size_arr, num_str));
-    
-    // PRINT_LOG("NAME_CMD <%-7s> NUM_CMD <%-2d> " , commands[cmd_hlt] + 4, cmd_hlt);
-    // PRINT_LOG("PRM<%-9s> CMD_ID <%lu>\n", "---", res_struct_arr->size_arr);
+#ifdef LOG
+    char num_str[100] = {};
+    int  tmp1 = cmd_hlt;
+    int  tmp2 = (int)res_struct_arr->size_arr;
+    CREATE_LOG_STR(commands[cmd_hlt] + 4, itoa(&tmp1, num_str, 'd'), "----", itoa(&tmp2, num_str, 'd'));
+#endif
 
     PRINT_INFO("name_cmd: %s[%4s]%s", RED, "hlt", RESET);
     PRINT_INFO("%s[%2d]%s\n", MAGENTA, cmd_hlt, RESET);
@@ -145,86 +72,6 @@ int create_byte_code(FILE *fp_src, FILE *fp_res)
     free(arr_label);
 
     return ошибок_нет;
-}
-
-char *my_int_to_string(int num, char *str_res)
-{
-    char num_str[30] = {};
-
-    if (num == 0)
-    {
-        str_res[0] = '0';
-        str_res[1] = '\0';
-    }
-    else
-    {
-        for (int i = 0; i < 30; i++)
-            num_str[i] = '\0';
-
-        for (int j = 0; num != 0; j++)
-        {
-            num_str[j] = 48 + num % 10;
-            num /= 10;        
-        }
-
-        
-        int step = 0;
-        for (int k = 29; k > 0; k--)
-        {
-            if (num_str[k] == '\0')
-                continue;
-            else
-            {
-                str_res[step] = num_str[k];
-                step++;
-            }
-        } 
-        str_res[step] = '\0';
-    }
-
-    return str_res;
-}
-
-void create_log_str(char *str, int flag, const char *info)
-{
-    if (flag == -1)
-    {
-        CREATE_SAMPLE();
-    }
-    else if (flag == -2)
-    {
-        PRINT_PARTITION();
-    }
-    else if (flag == 0)
-    {
-        PRINT_LOG("\n\n");
-        PRINT_PARTITION();
-        PRINT_TITLE_DATE();
-        PRINT_PARTITION();
-        CREATE_SAMPLE();
-        PRINT_TITLE();
-        PRINT_PARTITION();
-    }
-    else if (flag == 1)
-    {
-        for (int i = 0; info[i] != '\0'; i++)
-            str[5 + i] = info[i];
-    }
-    else if (flag == 2)
-    {
-        for (int i = 0; info[i] != '\0'; i++)
-            str[TWO_COLUM + 5 + i] = info[i];
-    }
-    else if (flag == 3)
-    {
-        for (int i = 0; info[i] != '\0'; i++)
-            str[THREE_COLUM + 5 + i] = info[i];
-    }
-    else if (flag == 4)
-    {
-        for (int i = 0; info[i] != '\0'; i++)
-            str[FOUR_COLUM + 5 + i] = info[i];
-    }
 }
 
 struct Array *ctor_struct_arr(FILE *fp_src)
@@ -277,8 +124,12 @@ int assembly(struct Array *src_struct_arr, struct Array *res_struct_arr, struct 
     size_t pc         = 0;
     size_t src_pc     = 0;
 
+#ifdef LOG
     char log_str[LEN_LOG_STR] = {};
-    char num_str[30] = {};
+    char num_str[MAX_LEN_NUM] = {};
+    int tmp1 = 0;
+    int tmp2 = 0;
+#endif
 
     while (src_pc < src_struct_arr->size_arr)
     {
