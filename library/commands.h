@@ -32,12 +32,15 @@ enum REGISTER{
 };
 
 #ifndef ASM_H
+#ifdef INFO
 static const char* REGISTER[] = {
     "rax",
     "rbx",
     "rcx",
     "rdx",
 };
+#endif
+
 #endif // !ASM_H
 
 #endif // !COMMANDS_H

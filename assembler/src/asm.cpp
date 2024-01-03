@@ -31,10 +31,7 @@ int create_byte_code(FILE *fp_src, FILE *fp_res)
     assert(fp_res != NULL);
     assert(fp_src != NULL);
 
-#ifdef LOG
-    char log_str[LEN_LOG_STR] = {};
-    create_log_str(log_str, TITLE_FLAG, "VENOM");
-#endif
+    PRINT_LOG_TITLE(fp_log);
 
     struct Array *src_struct_arr = ctor_struct_arr(fp_src);
     
@@ -51,12 +48,7 @@ int create_byte_code(FILE *fp_src, FILE *fp_res)
 
     res_struct_arr->arr_ptr[res_struct_arr->size_arr] = (char)cmd_hlt;
     
-#ifdef LOG
-    char num_str[100] = {};
-    int  tmp1 = cmd_hlt;
-    int  tmp2 = (int)res_struct_arr->size_arr;
-    CREATE_LOG_STR(commands[cmd_hlt] + 4, itoa(&tmp1, num_str, 'd'), "----", itoa(&tmp2, num_str, 'd'));
-#endif
+    PRINT_LOG_STR(fp_log, commands[cmd_hlt] + 4, "s", cmd_hlt, "d", "----", "s", res_struct_arr->size_arr, "lu");
 
     PRINT_INFO("name_cmd: %s[%4s]%s", RED, "hlt", RESET);
     PRINT_INFO("%s[%2d]%s\n", MAGENTA, cmd_hlt, RESET);
@@ -114,7 +106,7 @@ int assembly(struct Array *src_struct_arr, struct Array *res_struct_arr, struct 
             check_cmd = true;                            \
             ASM_DEF(pass_num, num);                      \
         }                   
-        
+    
     char *src_arr_ptr = src_struct_arr->arr_ptr;
     char *res_arr_ptr = res_struct_arr->arr_ptr;
     size_t sz_res_arr = res_struct_arr->size_arr;
@@ -123,13 +115,6 @@ int assembly(struct Array *src_struct_arr, struct Array *res_struct_arr, struct 
     num_t  num_user   = 0;
     size_t pc         = 0;
     size_t src_pc     = 0;
-
-#ifdef LOG
-    char log_str[LEN_LOG_STR] = {};
-    char num_str[MAX_LEN_NUM] = {};
-    int tmp1 = 0;
-    int tmp2 = 0;
-#endif
 
     while (src_pc < src_struct_arr->size_arr)
     {

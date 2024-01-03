@@ -12,7 +12,7 @@ CXXFLAGS="-D _DEBUG -ggdb3 -g -std=c++23 -O0 -Wall -Wextra -Weffc++ \
 -Wno-literal-suffix -Wno-missing-field-initializers -Wno-narrowing \
 -Wno-old-style-cast -Wno-varargs -Wstack-protector -fcheck-new \
 -fsized-deallocation -fstack-protector -fstrict-overflow \
--flto-odr-type-merging -fno-omit-frame-pointer -Wlarger-than=32768 \
+-flto-odr-type-merging -fno-omit-frame-pointer -Wlarger-than=49152 \
 -Wstack-usage=8192 -fPIE -Werror=vla -fsanitize=address,\
 alignment,bool,bounds,enum,float-cast-overflow,float-divide-by-zero,\
 integer-divide-by-zero,leak,nonnull-attribute,null,object-size,return,\
@@ -27,15 +27,28 @@ PATH_ASM_BIN="bin/asm"
 
 cd ~/GIT/processor
 
-if [ "$3" != "FLAGS" ]; then
+if [[ ! $1 =~ "f" ]]; then
     CXXFLAGS=""
 fi
 
+if [[ $1 =~ "i" ]]; then
+    CXXFLAGS+=" -DINFO"
+    LIB_MYSTACK="-lmystack_with_info"
+else
+    LIB_MYSTACK="-lmystack_without_info"
+
+fi
+
+if [[ $1 =~ "l" ]]; then
+    CXXFLAGS+=" -DLOG"
+    PATH_ASM_SRC+=" assembler/src/create_log.cpp"
+fi
+ 
 FILE=asm
 if test -f "$FILE"; then
     bin/asm $ASM_START_FILE
 else
-	g++ $1 $2 $CXXFLAGS $PATH_ASM_SRC -o bin/asm && bin/asm $ASM_START_FILE
+    g++ $CXXFLAGS $PATH_ASM_SRC -o bin/asm && bin/asm $ASM_START_FILE
 fi
 
 FILE=program-txt/res/res_asm.txt
@@ -44,11 +57,7 @@ if [ ! -f "$FILE" ]; then
     exit 1
 fi
 
-if [ "$1" = "-DINFO" ]; then
-	g++ $1 $CXXFLAGS processor/src/*.cpp -o bin/main -lmystack_with_info
-else
-	g++ $1 $CXXFLAGS processor/src/*.cpp -o bin/main -lmystack_without_info
-fi
+g++ $CXXFLAGS processor/src/*.cpp -o bin/main $LIB_MYSTACK
 
 FILE=bin/main
 if [ ! -f "$FILE" ]; then
@@ -57,4 +66,3 @@ if [ ! -f "$FILE" ]; then
 else
 	bin/main $PROC_START_FILE 
 fi
-

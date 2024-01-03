@@ -7,9 +7,7 @@
         sz_res_arr++;                                                                            \
     else if (pass_num == 2)                                                                      \
     {                                                                                            \
-        tmp1 = num;\
-        tmp2 = (int)pc;\
-        CREATE_LOG_STR(commands[num] + 4, itoa(&tmp1, num_str, 'd'), "----", itoa(&tmp2, num_str, 'd')); \
+        PRINT_LOG_STR(fp_log, commands[num] + 4, "s", num, "d", "----", "s", pc, "lu"); \
                                                                                                  \
         PRINT_INFO("name_cmd: %s[%4s]%s", RED, name_cmd, RESET);                                 \
         PRINT_INFO("%s[%2d]%s\n", MAGENTA, num, RESET);                                          \
@@ -42,9 +40,8 @@
         {                                                                                        \
             res_arr_ptr[pc] = (char)num;                                                         \
             memcpy(res_arr_ptr + pc + 1, &num_user, sizeof(num_t));                              \
-            tmp1 = num;\
-            tmp2 = (int)pc;\
-            CREATE_LOG_STR(commands[num] + 4, itoa(&tmp1, num_str, 'd'), itoa(&num_user, num_str, 'f'), itoa(&tmp2, num_str, 'd')); \
+\
+            PRINT_LOG_STR(fp_log, commands[num] + 4, "s", num, "d", num_user, "lf", pc, "lu"); \
                                                                                                  \
             pc     += 1 + sizeof(num_t);                                                         \
             src_pc += (size_t)ncr;                                                               \
@@ -61,9 +58,7 @@
                 return ошибка_в_имени_регистра;                                                  \
             }                                                                                    \
                                                                                                  \
-            tmp1 = num;\
-            tmp2 = (int)pc;\
-            CREATE_LOG_STR(commands[num] + 4, itoa(&tmp1, num_str, 'd'), name_cmd, itoa(&tmp2, num_str, 'd')); \
+            PRINT_LOG_STR(fp_log, commands[num] + 4, "s", num, "d", name_cmd, "s", pc, "lu"); \
                                                                                                  \
             pc     += 2;                                                                         \
             src_pc += (size_t)ncr;                                                               \
@@ -93,10 +88,8 @@
             return ошибка_в_имени_регистра;                                                       \
         }                                                                                         \
                                                                                                   \
-        tmp1 = num;\
-        tmp2 = (int)pc;\
-        CREATE_LOG_STR(commands[num] + 4, itoa(&tmp1, num_str, 'd'), name_cmd, itoa(&tmp2, num_str, 'd')); \
-                                                                                                  \
+        PRINT_LOG_STR(fp_log, commands[num] + 4, "s", num, "d", name_cmd, "s", pc, "lu"); \
+\
         pc     += 2;                                                                              \
         src_pc += (size_t)ncr;                                                                    \
     }
@@ -131,10 +124,8 @@
         }                                                                                         \
         memcpy(res_arr_ptr + pc + 1, &num_cmd, sizeof(int));                                      \
                                                                                                   \
-        tmp1 = num;\
-        tmp2 = (int)pc;\
-        CREATE_LOG_STR(commands[num] + 4, itoa(&tmp1, num_str, 'd'), itoa(&num_cmd, num_str, 'd'), itoa(&tmp2, num_str, 'd')); \
-                                                                                                  \
+        PRINT_LOG_STR(fp_log, commands[num] + 4, "s", num, "d", num_cmd, "d", pc, "lu"); \
+                                                                                                 \
         pc     += 1 + sizeof(int);                                                                \
         src_pc += (size_t)ncr;                                                                    \
     }
@@ -169,8 +160,7 @@
         for (int i = (int)pc + 1; i < num_cmd; i++)                                               \
             res_arr_ptr[i] = 0;                                                                   \
                                                                                                   \
-        tmp1 = num;\
-        CREATE_LOG_STR(commands[num] + 4, itoa(&tmp1, num_str, 'd'), itoa(&num_cmd, num_str, 'd'), "----"); \
+        PRINT_LOG_STR(fp_log, commands[num] + 4, "s", num, "d", num_cmd, "d", "----", "s"); \
                                                                                                   \
         pc = (size_t)num_cmd;                                                                     \
         src_pc += (size_t)ncr;                                                                    \
