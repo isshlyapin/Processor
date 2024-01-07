@@ -2,171 +2,209 @@
 #define CMD_DEFINE_H
 
 #ifdef ASM_H
-#define ASM_CMD_WITHOUT_PRM(pass_num, num)                                                       \
-    if (pass_num == 1)                                                                           \
-        sz_res_arr++;                                                                            \
-    else if (pass_num == 2)                                                                      \
-    {                                                                                            \
-        PRINT_LOG_STR(fp_log, commands[num] + 4, "s", num, "d", "----", "s", pc, "lu"); \
-                                                                                                 \
-        PRINT_INFO("name_cmd: %s[%4s]%s", RED, name_cmd, RESET);                                 \
-        PRINT_INFO("%s[%2d]%s\n", MAGENTA, num, RESET);                                          \
-                                                                                                 \
-        res_arr_ptr[pc] = (char)num;                                                             \
-        pc++;                                                                                    \
+#define ASM_CMD_WITHOUT_PRM(pass_num, num)                                                                    \
+    if (pass_num == 1)                                                                                        \
+        sz_res_arr++;                                                                                         \
+    else if (pass_num == 2)                                                                                   \
+    {                                                                                                         \
+        PRINT_LOG_STR(fp_log, commands[num] + 4, "s", "----", "s", num, "d", "----", "s", pc, "lu");          \
+                                                                                                              \
+        PRINT_INFO("name_cmd: %s[%4s]%s", RED, name_cmd, RESET);                                              \
+        PRINT_INFO("%s[%2d]%s\n", MAGENTA, num, RESET);                                                       \
+                                                                                                              \
+        res_arr_ptr[pc] = (char)num;                                                                          \
+        pc++;                                                                                                 \
     }
 
-#define ASM_PUSH(pass_num, num)                                                                  \
-    if (pass_num == 1)                                                                           \
-    {                                                                                            \
-        if (sscanf(src_arr_ptr + src_pc, NUM_MOD_SCAN "\n%n", &num_user, &ncr) == 1)             \
-        {                                                                                        \
-            src_pc     += (size_t)ncr;                                                           \
-            sz_res_arr += 1 + sizeof(num_t);                                                     \
-        }                                                                                        \
-        else                                                                                     \
-        {                                                                                        \
-            sz_res_arr += 2;                                                                     \
-            src_pc     += LEN_NAME_REG + 1;                                                      \
-        }                                                                                        \
-    }                                                                                            \
-    else if (pass_num == 2)                                                                      \
-    {                                                                                            \
-                                                                                                 \
-        PRINT_INFO("name_cmd: %s[%4s]%s", RED, name_cmd, RESET);                                 \
-        PRINT_INFO("%s[%2d]%s\n", MAGENTA, num, RESET);                                          \
-                                                                                                 \
-        if (sscanf(src_arr_ptr + src_pc, NUM_MOD_SCAN "\n%n", &num_user, &ncr) == 1)             \
-        {                                                                                        \
-            res_arr_ptr[pc] = (char)num;                                                         \
-            memcpy(res_arr_ptr + pc + 1, &num_user, sizeof(num_t));                              \
-\
-            PRINT_LOG_STR(fp_log, commands[num] + 4, "s", num, "d", num_user, "lf", pc, "lu"); \
-                                                                                                 \
-            pc     += 1 + sizeof(num_t);                                                         \
-            src_pc += (size_t)ncr;                                                               \
-        }                                                                                        \
-        else                                                                                     \
-        {                                                                                        \
-            sscanf (src_arr_ptr + src_pc, "%s \n%n", name_cmd, &ncr);                            \
-            res_arr_ptr[pc]   = (char)(num^64);                                                  \
-            res_arr_ptr[pc+1] = (char)check_num_reg(name_cmd);                                   \
-                                                                                                 \
-            if (res_arr_ptr[pc+1] == ошибка_в_имени_регистра)                                    \
-            {                                                                                    \
-                PRINT_ERROR("%s\n", ERROR_TEXT[ошибка_в_имени_регистра]);                        \
-                return ошибка_в_имени_регистра;                                                  \
-            }                                                                                    \
-                                                                                                 \
-            PRINT_LOG_STR(fp_log, commands[num] + 4, "s", num, "d", name_cmd, "s", pc, "lu"); \
-                                                                                                 \
-            pc     += 2;                                                                         \
-            src_pc += (size_t)ncr;                                                               \
-                                                                                                 \
-        }                                                                                        \
+#define ASM_PUSH(pass_num, num)                                                                               \
+    if (pass_num == 1)                                                                                        \
+    {                                                                                                         \
+        if (sscanf(src_arr_ptr + src_pc, NUM_MOD_SCAN "\n%n", &num_user, &ncr) == 1)                          \
+        {                                                                                                     \
+            printf("<<украл\n");                                                                              \
+            src_pc     += (size_t)ncr;                                                                        \
+            sz_res_arr += 1 + sizeof(num_t);                                                                  \
+        }                                                                                                     \
+        else if (sscanf(src_arr_ptr + src_pc, "[%d]\n%n", &num_cmd, &ncr) == 1)                               \
+        {                                                                                                     \
+            printf("<<угадал\n");                                                                             \
+            src_pc     += (size_t)ncr;                                                                        \
+            sz_res_arr += 1 + sizeof(int);                                                                    \
+        }                                                                                                     \
+        else                                                                                                  \
+        {                                                                                                     \
+            sz_res_arr += 2;                                                                                  \
+            src_pc     += LEN_NAME_REG + 1;                                                                   \
+        }                                                                                                     \
+    }                                                                                                         \
+    else if (pass_num == 2)                                                                                   \
+    {                                                                                                         \
+        PRINT_INFO("name_cmd: %s[%4s]%s", RED, name_cmd, RESET);                                              \
+        PRINT_INFO("%s[%2d]%s\n", MAGENTA, num, RESET);                                                       \
+                                                                                                              \
+        if (sscanf(src_arr_ptr + src_pc, NUM_MOD_SCAN "\n%n", &num_user, &ncr) == 1)                          \
+        {                                                                                                     \
+            res_arr_ptr[pc] = (char)num;                                                                      \
+            memcpy(res_arr_ptr + pc + 1, &num_user, sizeof(num_t));                                           \
+                                                                                                              \
+            PRINT_LOG_STR(fp_log, commands[num] + 4, "s", "----", "s", num, "d", num_user, "lf", pc, "lu");   \
+                                                                                                              \
+            pc     += 1 + sizeof(num_t);                                                                      \
+            src_pc += (size_t)ncr;                                                                            \
+        }                                                                                                     \
+        else if (sscanf(src_arr_ptr + src_pc, "[%d]\n%n", &num_cmd, &ncr) == 1)                               \
+        {                                                                                                     \
+            res_arr_ptr[pc]   = (char)(num^32);                                                               \
+            memcpy(res_arr_ptr + pc + 1, &num_cmd, sizeof(int));                                              \
+                                                                                                              \
+            PRINT_LOG_STR(fp_log, commands[num] + 4, "s", num_cmd, "d", num, "d", num_user, "lf", pc, "lu");  \
+                                                                                                              \
+            pc     += 1 + sizeof(int);                                                                        \
+            src_pc += (size_t)ncr;                                                                            \
+        }                                                                                                     \
+        else                                                                                                  \
+        {                                                                                                     \
+            sscanf (src_arr_ptr + src_pc, "%s \n%n", name_cmd, &ncr);                                         \
+            res_arr_ptr[pc]   = (char)(num^64);                                                               \
+            res_arr_ptr[pc+1] = (char)check_num_reg(name_cmd);                                                \
+                                                                                                              \
+            if (res_arr_ptr[pc+1] == ошибка_в_имени_регистра)                                                 \
+            {                                                                                                 \
+                PRINT_ERROR("%s\n", ERROR_TEXT[ошибка_в_имени_регистра]);                                     \
+                return ошибка_в_имени_регистра;                                                               \
+            }                                                                                                 \
+                                                                                                              \
+            PRINT_LOG_STR(fp_log, commands[num] + 4, "s", "----", "s", num, "d", name_cmd, "s", pc, "lu");    \
+                                                                                                              \
+            pc     += 2;                                                                                      \
+            src_pc += (size_t)ncr;                                                                            \
+        }                                                                                                     \
     }                                                                                            
 
-#define ASM_POP(pass_num, num)                                                                    \
-    if (pass_num == 1)                                                                            \
-    {                                                                                             \
-        sz_res_arr += 2;                                                                          \
-        src_pc     += LEN_NAME_REG + 1;                                                           \
-    }                                                                                             \
-    else if (pass_num == 2)                                                                       \
-    {                                                                                             \
-                                                                                                  \
-        PRINT_INFO("name_cmd: %s[%4s]%s", RED, name_cmd, RESET);                                  \
-        PRINT_INFO("%s[%2d]%s\n", MAGENTA, num, RESET);                                           \
-                                                                                                  \
-        res_arr_ptr[pc] = num;                                                                    \
-                                                                                                  \
-        sscanf (src_arr_ptr + src_pc, "%s \n%n" , name_cmd, &ncr);                                \
-        res_arr_ptr[pc+1] = (char)check_num_reg(name_cmd);                                        \
-        if (res_arr_ptr[pc+1] == ошибка_в_имени_регистра)                                         \
-        {                                                                                         \
-            PRINT_ERROR("%s\n", ERROR_TEXT[ошибка_в_имени_регистра]);                         \
-            return ошибка_в_имени_регистра;                                                       \
-        }                                                                                         \
-                                                                                                  \
-        PRINT_LOG_STR(fp_log, commands[num] + 4, "s", num, "d", name_cmd, "s", pc, "lu"); \
-\
-        pc     += 2;                                                                              \
-        src_pc += (size_t)ncr;                                                                    \
+#define ASM_POP(pass_num, num)                                                                                \
+    if (pass_num == 1)                                                                                        \
+    {                                                                                                         \
+        if (sscanf(src_arr_ptr + src_pc, "[%d]" NUM_MOD_SCAN "\n%n", &num_cmd, &num_user, &ncr) == 2)         \
+        {                                                                                                     \
+            printf("<<угадал\n");                                                                             \
+            src_pc     += (size_t)ncr;                                                                        \
+            sz_res_arr += 1 + sizeof(num_t) + sizeof(int);                                                    \
+        }                                                                                                     \
+        else                                                                                                  \
+        {                                                                                                     \
+            sz_res_arr += 2;                                                                                  \
+            src_pc     += LEN_NAME_REG + 1;                                                                   \
+        }                                                                                                     \
+    }                                                                                                         \
+    else if (pass_num == 2)                                                                                   \
+    {                                                                                                         \
+        PRINT_INFO("name_cmd: %s[%-4s]%s", RED, name_cmd, RESET);                                             \
+        PRINT_INFO("%s[%-2d]%s\n", MAGENTA, num, RESET);                                                      \
+                                                                                                              \
+                                                                                                              \
+        if (sscanf(src_arr_ptr + src_pc, "[%d]" NUM_MOD_SCAN "\n%n", &num_cmd, &num_user, &ncr) == 2)         \
+        {                                                                                                     \
+            res_arr_ptr[pc] = (char)(num^64);                                                                 \
+                                                                                                              \
+            memcpy(res_arr_ptr + pc + 1, &num_cmd, sizeof(int));                                              \
+            memcpy(res_arr_ptr + pc + sizeof(int) + 1, &num_user, sizeof(num_t));                             \
+                                                                                                              \
+            PRINT_LOG_STR(fp_log, commands[num] + 4, "s", num_cmd, "d", num, "d", name_cmd, "s", pc, "lu");   \
+                                                                                                              \
+            pc     += 2;                                                                                      \
+            src_pc += (size_t)ncr;                                                                            \
+        }                                                                                                     \
+        else if (sscanf (src_arr_ptr + src_pc, "%s \n%n" , name_cmd, &ncr) == 1)                              \
+        {                                                                                                     \
+            res_arr_ptr[pc] = (char)num;                                                                      \
+                                                                                                              \
+            res_arr_ptr[pc+1] = (char)check_num_reg(name_cmd);                                                \
+            if (res_arr_ptr[pc+1] == ошибка_в_имени_регистра)                                                 \
+            {                                                                                                 \
+                PRINT_ERROR("%s\n", ERROR_TEXT[ошибка_в_имени_регистра]);                                     \
+                return ошибка_в_имени_регистра;                                                               \
+            }                                                                                                 \
+                                                                                                              \
+            PRINT_LOG_STR(fp_log, commands[num] + 4, "s", "----", "s", num, "d", name_cmd, "s", pc, "lu");    \
+                                                                                                              \
+            pc     += 2;                                                                                      \
+            src_pc += (size_t)ncr;                                                                            \
+        }                                                                                                     \
     }
         
-#define ASM_JMP_and_CALL(pass_num, num)                                                           \
-    if (pass_num == 1)                                                                            \
-    {                                                                                             \
-        if (sscanf(src_arr_ptr + src_pc, "%d \n%n", &num_cmd, &ncr) != 1)                         \
-            sscanf(src_arr_ptr + src_pc, "%s \n%n", name_cmd, &ncr);                              \
-                                                                                                  \
-        sz_res_arr += 1 + sizeof(int);                                                            \
-        src_pc += (size_t)ncr;                                                                    \
-    }                                                                                             \
-    else if (pass_num == 2)                                                                       \
-    {                                                                                             \
-        PRINT_INFO("name_cmd: %s[%4s]%s", RED, name_cmd, RESET);                                  \
-        PRINT_INFO("%s[%2d]%s\n", MAGENTA, num, RESET);                                           \
-                                                                                                  \
-        res_arr_ptr[pc] = num;                                                                    \
-                                                                                                  \
-        if (sscanf(src_arr_ptr + src_pc, "%d \n%n", &num_cmd, &ncr) != 1)                         \
-        {                                                                                         \
-            sscanf(src_arr_ptr + src_pc, "%s \n%n", name_cmd, &ncr);                              \
-            for (int i = 1; i <= arr_lab[0].jmp_id; i++)                                          \
-            {                                                                                     \
-                if (!strcmp(arr_lab[i].name_lab, name_cmd))                                       \
-                {                                                                                 \
-                    num_cmd = arr_lab[i].jmp_id;                                                  \
-                    break;                                                                        \
-                }                                                                                 \
-            }                                                                                     \
-        }                                                                                         \
-        memcpy(res_arr_ptr + pc + 1, &num_cmd, sizeof(int));                                      \
-                                                                                                  \
-        PRINT_LOG_STR(fp_log, commands[num] + 4, "s", num, "d", num_cmd, "d", pc, "lu"); \
-                                                                                                 \
-        pc     += 1 + sizeof(int);                                                                \
-        src_pc += (size_t)ncr;                                                                    \
+#define ASM_JMP_and_CALL(pass_num, num)                                                                       \
+    if (pass_num == 1)                                                                                        \
+    {                                                                                                         \
+        if (sscanf(src_arr_ptr + src_pc, "%d \n%n", &num_cmd, &ncr) != 1)                                     \
+            sscanf(src_arr_ptr + src_pc, "%s \n%n", name_cmd, &ncr);                                          \
+                                                                                                              \
+        sz_res_arr += 1 + sizeof(int);                                                                        \
+        src_pc += (size_t)ncr;                                                                                \
+    }                                                                                                         \
+    else if (pass_num == 2)                                                                                   \
+    {                                                                                                         \
+        PRINT_INFO("name_cmd: %s[%4s]%s", RED, name_cmd, RESET);                                              \
+        PRINT_INFO("%s[%2d]%s\n", MAGENTA, num, RESET);                                                       \
+                                                                                                              \
+        res_arr_ptr[pc] = num;                                                                                \
+                                                                                                              \
+        if (sscanf(src_arr_ptr + src_pc, "%d \n%n", &num_cmd, &ncr) != 1)                                     \
+        {                                                                                                     \
+            sscanf(src_arr_ptr + src_pc, "%s \n%n", name_cmd, &ncr);                                          \
+            for (int i = 1; i <= arr_lab[0].jmp_id; i++)                                                      \
+            {                                                                                                 \
+                if (!strcmp(arr_lab[i].name_lab, name_cmd))                                                   \
+                {                                                                                             \
+                    num_cmd = arr_lab[i].jmp_id;                                                              \
+                    break;                                                                                    \
+                }                                                                                             \
+            }                                                                                                 \
+        }                                                                                                     \
+        memcpy(res_arr_ptr + pc + 1, &num_cmd, sizeof(int));                                                  \
+                                                                                                              \
+        PRINT_LOG_STR(fp_log, commands[num] + 4, "s", "----", "s", num, "d", num_cmd, "d", pc, "lu");         \
+                                                                                                              \
+        pc     += 1 + sizeof(int);                                                                            \
+        src_pc += (size_t)ncr;                                                                                \
     }
 
-#define ASM_ORG(pass_num, num)                                                                    \
-    if (pass_num == 1)                                                                            \
-    {                                                                                             \
-        sscanf(src_arr_ptr + src_pc, "%d \n%n", &num_cmd, &ncr);                                  \
-                                                                                                  \
-        if (ORG_NOT_CORRECT(num_cmd, sz_res_arr))                                                 \
-        {                                                                                         \
-            PRINT_ERROR("%s\n", ERROR_TEXT[ошибка_в_директиве_org]);                              \
-            return ошибка_в_директиве_org;                                                        \
-        }                                                                                         \
-                                                                                                  \
-        sz_res_arr = (size_t)num_cmd;                                                             \
-        src_pc += (size_t)ncr;                                                                    \
-    }                                                                                             \
-    else if (pass_num == 2)                                                                       \
-    {                                                                                             \
-        PRINT_INFO("name_cmd: %s[%4s]%s", RED, name_cmd, RESET);                                  \
-        PRINT_INFO("%s[%2d]%s\n", MAGENTA, num, RESET);                                           \
-                                                                                                  \
-        sscanf(src_arr_ptr + src_pc, "%d \n%n", &num_cmd, &ncr);                                  \
-                                                                                                  \
-        if (ORG_NOT_CORRECT(num_cmd, pc + 1))                                                     \
-        {                                                                                         \
-            PRINT_ERROR("%s\n", ERROR_TEXT[ошибка_в_директиве_org]);                              \
-            return ошибка_в_директиве_org;                                                        \
-        }                                                                                         \
-                                                                                                  \
-        for (int i = (int)pc + 1; i < num_cmd; i++)                                               \
-            res_arr_ptr[i] = 0;                                                                   \
-                                                                                                  \
-        PRINT_LOG_STR(fp_log, commands[num] + 4, "s", num, "d", num_cmd, "d", "----", "s"); \
-                                                                                                  \
-        pc = (size_t)num_cmd;                                                                     \
-        src_pc += (size_t)ncr;                                                                    \
+#define ASM_ORG(pass_num, num)                                                                                \
+    if (pass_num == 1)                                                                                        \
+    {                                                                                                         \
+        sscanf(src_arr_ptr + src_pc, "%d \n%n", &num_cmd, &ncr);                                              \
+                                                                                                              \
+        if (ORG_NOT_CORRECT(num_cmd, sz_res_arr))                                                             \
+        {                                                                                                     \
+            PRINT_ERROR("%s\n", ERROR_TEXT[ошибка_в_директиве_org]);                                          \
+            return ошибка_в_директиве_org;                                                                    \
+        }                                                                                                     \
+                                                                                                              \
+        sz_res_arr = (size_t)num_cmd;                                                                         \
+        src_pc += (size_t)ncr;                                                                                \
+    }                                                                                                         \
+    else if (pass_num == 2)                                                                                   \
+    {                                                                                                         \
+        PRINT_INFO("name_cmd: %s[%4s]%s", RED, name_cmd, RESET);                                              \
+        PRINT_INFO("%s[%2d]%s\n", MAGENTA, num, RESET);                                                       \
+                                                                                                              \
+        sscanf(src_arr_ptr + src_pc, "%d \n%n", &num_cmd, &ncr);                                              \
+                                                                                                              \
+        if (ORG_NOT_CORRECT(num_cmd, pc + 1))                                                                 \
+        {                                                                                                     \
+            PRINT_ERROR("%s\n", ERROR_TEXT[ошибка_в_директиве_org]);                                          \
+            return ошибка_в_директиве_org;                                                                    \
+        }                                                                                                     \
+                                                                                                              \
+        for (int i = (int)pc + 1; i < num_cmd; i++)                                                           \
+            res_arr_ptr[i] = 0;                                                                               \
+                                                                                                              \
+        PRINT_LOG_STR(fp_log, commands[num] + 4, "s", "----", "s", num, "d", num_cmd, "d", "----", "s");      \
+                                                                                                              \
+        pc = (size_t)num_cmd;                                                                                 \
+        src_pc += (size_t)ncr;                                                                                \
     }
 
-#endif // !ASM_H
+#endif // ASM_H
 
 
 #ifdef PROCESSOR_H
@@ -193,7 +231,7 @@
 #define PROC_HLT(venom_prm) break;  
 
 #define PROC_PUSH(prm)                                                        \
-    if (num_cmd != prm)                                                       \
+    if (num_cmd == prm^64)                                                       \
     {                                                                         \
         num_cmd = src_arr[pc + 1];                                            \
         PUSH(*PTR_REG(num_cmd));                                              \
@@ -202,7 +240,17 @@
         PRINT_INFO("Register from file: <%s>\n", REGISTER[(int)num_cmd]);     \
         continue;                                                             \
     }                                                                         \
-    else                                                                      \
+    else if (num_cmd == prm^32)\
+    {\
+        memcpy(&id_jmp, &src_arr[pc + 1], sizeof(int));\
+        memcpy(&RAM[id_jmp], &src_arr[pc + 1 + sizeof(int)], sizeof(num_t));\
+        pc += 1 + sizeof(int) + sizeof(num_t);\
+\
+        PRINT_INFO("RAM_ID = [%d]\n", id_jmp);\
+        PRINT_INFO("Numeric from file: <%.2lf>\n", (num_t)RAM[id_jmp]);                     \
+        continue;\
+    }\
+    else if (num_cmd == prm)                                               \
     {                                                                         \
         memcpy(&num1, src_arr + pc + 1, sizeof(num_t));                       \
         PUSH(num1);                                                           \
@@ -212,13 +260,21 @@
         continue;                                                             \
     }
 
-#define PROC_POP(venom_prm)                                                   \
-    num_cmd = src_arr[pc + 1];                                                \
-    POP(PTR_REG(num_cmd));                                                    \
-    pc += 2;                                                                  \
-                                                                              \
-    PRINT_INFO("Register from file: <%s>\n", REGISTER[(int)num_cmd]);         \
-    continue;
+#define PROC_POP(prm)
+    if (num == prm) 
+    {
+        num_cmd = src_arr[pc + 1];                                                \
+        POP(PTR_REG(num_cmd));                                                    \
+        pc += 2;                                                                  \
+                                                                                    \
+        PRINT_INFO("Register from file: <%s>\n", REGISTER[(int)num_cmd]);         \
+        continue;  
+    }
+    else if (num == prm^64)
+    {
+        
+        continue;
+    }                                                   \
 
 #define PROC_IN(venom_prm)                                                    \
     printf("Введите число: ");                                                \

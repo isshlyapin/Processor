@@ -48,7 +48,7 @@ int create_byte_code(FILE *fp_src, FILE *fp_res)
 
     res_struct_arr->arr_ptr[res_struct_arr->size_arr] = (char)cmd_hlt;
     
-    PRINT_LOG_STR(fp_log, commands[cmd_hlt] + 4, "s", cmd_hlt, "d", "----", "s", res_struct_arr->size_arr, "lu");
+    PRINT_LOG_STR(fp_log, commands[cmd_hlt] + 4, "s", "----", "s", cmd_hlt, "d", "----", "s", res_struct_arr->size_arr, "lu");
 
     PRINT_INFO("name_cmd: %s[%4s]%s", RED, "hlt", RESET);
     PRINT_INFO("%s[%2d]%s\n", MAGENTA, cmd_hlt, RESET);
@@ -154,6 +154,8 @@ int assembly(struct Array *src_struct_arr, struct Array *res_struct_arr, struct 
         }
         else
             src_pc += (size_t)ncr;
+
+        printf(">>%s\n", name_cmd);
 
         #include "../../library/instructions_def.h"
 

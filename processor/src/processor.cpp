@@ -6,7 +6,7 @@ int process_commands(FILE *fp_src, Storage *str)
     #include "../../library/cmd_define.h"
     
     #define NEW_INSTRUCTIONS(name, num, ASM_CMD, DASM_CMD, PROC_CMD)   \
-        if (num == (num_cmd & 63))                                     \
+        if (num == (num_cmd & 31))                                     \
         {                                                              \
             PROC_CMD(num);                                             \
         }
@@ -77,6 +77,7 @@ int StorageCtor(Storage *str)
 {
     StackCtor(&str->stk_cmd, STD_STACK_CAP);
     StackCtor(&str->stk_ptr, STD_STACK_CAP);
+    str->RAM = (char *)calloc(AMOUNT_RAM, sizeof(char));
 
     str->regs[rax] = VENOM_ELEM;
     str->regs[rbx] = VENOM_ELEM;
@@ -90,6 +91,7 @@ int StorageDtor(Storage *str)
 {
     StackDtor(&str->stk_cmd);
     StackDtor(&str->stk_ptr);
+    free(str->RAM);
     
     str->regs[rax] = VENOM_ELEM;
     str->regs[rbx] = VENOM_ELEM;

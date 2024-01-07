@@ -14,12 +14,13 @@
 #include "../../library/color.h"
 
 static const double EPSILON = 1e-9;
-
+static const size_t AMOUNT_RAM = 1024*1024*1024;
 
 // STRUCT LIST
 struct Storage {
   Stack stk_cmd;
   Stack stk_ptr;
+  char *RAM;
   num_t regs[4];
 };
 

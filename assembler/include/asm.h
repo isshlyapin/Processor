@@ -62,11 +62,12 @@ char *itoa(void *num_ptr, char *str_res, char type);
 
     #define CLOSE_LOG_FILE() fclose(fp_log)
     
-    #define PRINT_LOG_STR(fp, first_col, tp1, second_col, tp2, third_col, tp3, fourth_col, tp4)    \
-        fprintf(fp, "|%*s%*" tp1 "|",   INDENT_COL, " ", -WIDTH_COL, first_col);                   \
-        fprintf(fp, "%*s%*"  tp2 "|",   INDENT_COL, " ", -WIDTH_COL, second_col);                  \
-        fprintf(fp, "%*s%*"  tp3 "|",   INDENT_COL, " ", -WIDTH_COL, third_col);                   \
-        fprintf(fp, "%*s%*"  tp4 "|\n", INDENT_COL, " ", -WIDTH_COL, fourth_col);                  \
+    #define PRINT_LOG_STR(fp, col1, tp1, col2, tp2, col3, tp3, col4, tp4, col5, tp5)    \
+        fprintf(fp, "|%*s%*" tp1 "|",   INDENT_COL, " ", -WIDTH_COL, col1);             \
+        fprintf(fp, "%*s%*"  tp2 "|",   INDENT_COL, " ", -WIDTH_COL, col2);             \
+        fprintf(fp, "%*s%*"  tp3 "|",   INDENT_COL, " ", -WIDTH_COL, col3);             \
+        fprintf(fp, "%*s%*"  tp4 "|",   INDENT_COL, " ", -WIDTH_COL, col4);             \
+        fprintf(fp, "%*s%*"  tp5 "|\n", INDENT_COL, " ", -WIDTH_COL, col5);             \
         print_log_partition(fp);
 #else
     #define OPEN_LOG_FIlE()          {}

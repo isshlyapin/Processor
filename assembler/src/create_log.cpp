@@ -4,9 +4,10 @@
 #include "../include/log.h"
 
 static const char *NAME_COL1 = "Name cmd";
-static const char *NAME_COL2 = "Num cmd";
-static const char *NAME_COL3 = "Parameter";
-static const char *NAME_COL4 = "CMD ID";
+static const char *NAME_COL2 = "RAM ID";
+static const char *NAME_COL3 = "Num cmd";
+static const char *NAME_COL4 = "Parameter";
+static const char *NAME_COL5 = "CMD ID";
 
 void print_log_partition(FILE *fp_log);
 void print_log_title(FILE* fp_log);
@@ -69,7 +70,9 @@ void print_log_title(FILE* fp_log)
     fprintf(fp_log, "|%*s" "%*s" "|",   INDENT_COL, " ", -WIDTH_COL, NAME_COL1);
     fprintf(fp_log, "%*s"  "%*s" "|",   INDENT_COL, " ", -WIDTH_COL, NAME_COL2);
     fprintf(fp_log, "%*s"  "%*s" "|",   INDENT_COL, " ", -WIDTH_COL, NAME_COL3);
-    fprintf(fp_log, "%*s"  "%*s" "|\n", INDENT_COL, " ", -WIDTH_COL, NAME_COL4);
+    fprintf(fp_log, "%*s"  "%*s" "|",   INDENT_COL, " ", -WIDTH_COL, NAME_COL4);
+    fprintf(fp_log, "%*s"  "%*s" "|\n", INDENT_COL, " ", -WIDTH_COL, NAME_COL5);
+    
     print_log_partition(fp_log);
 
     free(log_str);

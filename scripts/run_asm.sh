@@ -12,7 +12,7 @@ integer-divide-by-zero,leak,nonnull-attribute,null,object-size,return,\
 returns-nonnull-attribute,shift,signed-integer-overflow,undefined,\
 unreachable,vla-bound,vptr"
 
-ASM_START_FILE="program-txt/src/src-factorial-with_label.txt program-txt/res/res_asm.txt log/log_file.txt"
+ASM_START_FILE="program-txt/src/ram_test.txt program-txt/res/res_asm.txt log/log_file.txt"
 
 cd ~/GIT/processor/
 
