@@ -18,10 +18,10 @@ static const size_t AMOUNT_RAM = 1024*1024*1024;
 
 // STRUCT LIST
 struct Storage {
-  Stack stk_cmd;
-  Stack stk_ptr;
-  char *RAM;
-  num_t regs[4];
+    Stack stk_cmd;
+    Stack stk_ptr;
+    char  *RAM;
+    num_t regs[4];
 };
 
 struct Array{
@@ -49,7 +49,7 @@ size_t search_size_file(FILE *fp_src);
 // DEFINE LIST
 #ifdef INFO
     #define PRINTF_INFO_CMD()                                                   \
-        PRINT_INFO("%s[%s]%s", GREEN, commands[num_cmd & 63] + 4, RESET);       \
+        PRINT_INFO("%s[%s]%s", GREEN, commands[num_cmd & 31] + 4, RESET);       \
         PRINT_INFO("%s[%d]%s\n", MAGENTA, num_cmd & 63, RESET);
 #else
     #define PRINTF_INFO_CMD() {};

@@ -19,7 +19,7 @@ integer-divide-by-zero,leak,nonnull-attribute,null,object-size,return,\
 returns-nonnull-attribute,shift,signed-integer-overflow,undefined,\
 unreachable,vla-bound,vptr"
 
-ASM_START_FILE="program-txt/src/src-factorial-with_label.txt program-txt/res/res_asm.txt log/log_file.txt"
+ASM_START_FILE="program-txt/src/ram_test.txt program-txt/res/res_asm.txt log/log_test.txt"
 PROC_START_FILE="program-txt/res/res_asm.txt"
 
 PATH_ASM_SRC="assembler/src/asm.cpp"
@@ -36,7 +36,6 @@ if [[ $1 =~ "i" ]]; then
     LIB_MYSTACK="-lmystack_with_info"
 else
     LIB_MYSTACK="-lmystack_without_info"
-
 fi
 
 if [[ $1 =~ "l" ]]; then

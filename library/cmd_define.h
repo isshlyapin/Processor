@@ -1,13 +1,24 @@
 #ifndef CMD_DEFINE_H
 #define CMD_DEFINE_H
 
+
+/*------------------------------------------------------------------------------------------------------------*/
+/*ASSEMBLER COMMANDS DESCRIPTION*/
+/*------------------------------------------------------------------------------------------------------------*/
 #ifdef ASM_H
+
 #define ASM_CMD_WITHOUT_PRM(pass_num, num)                                                                    \
     if (pass_num == 1)                                                                                        \
+    {                                                                                                         \
         sz_res_arr++;                                                                                         \
+    }                                                                                                         \
     else if (pass_num == 2)                                                                                   \
     {                                                                                                         \
-        PRINT_LOG_STR(fp_log, commands[num] + 4, "s", "----", "s", num, "d", "----", "s", pc, "lu");          \
+        PRINT_LOG_STR(fp_log, "s",  commands[num] + 4,                                                        \
+                              "s",  "----",                                                                   \
+                              "d",  num,                                                                      \
+                              "s",  "----",                                                                   \
+                              "lu", pc);                                                                      \
                                                                                                               \
         PRINT_INFO("name_cmd: %s[%4s]%s", RED, name_cmd, RESET);                                              \
         PRINT_INFO("%s[%2d]%s\n", MAGENTA, num, RESET);                                                       \
@@ -21,13 +32,11 @@
     {                                                                                                         \
         if (sscanf(src_arr_ptr + src_pc, NUM_MOD_SCAN "\n%n", &num_user, &ncr) == 1)                          \
         {                                                                                                     \
-            printf("<<украл\n");                                                                              \
             src_pc     += (size_t)ncr;                                                                        \
             sz_res_arr += 1 + sizeof(num_t);                                                                  \
         }                                                                                                     \
         else if (sscanf(src_arr_ptr + src_pc, "[%d]\n%n", &num_cmd, &ncr) == 1)                               \
         {                                                                                                     \
-            printf("<<угадал\n");                                                                             \
             src_pc     += (size_t)ncr;                                                                        \
             sz_res_arr += 1 + sizeof(int);                                                                    \
         }                                                                                                     \
@@ -47,7 +56,11 @@
             res_arr_ptr[pc] = (char)num;                                                                      \
             memcpy(res_arr_ptr + pc + 1, &num_user, sizeof(num_t));                                           \
                                                                                                               \
-            PRINT_LOG_STR(fp_log, commands[num] + 4, "s", "----", "s", num, "d", num_user, "lf", pc, "lu");   \
+            PRINT_LOG_STR(fp_log, "s",    commands[num] + 4,                                                  \
+                                  "s",    "----",                                                             \
+                                  "d",    num,                                                                \
+                                  ".3lf", num_user,                                                           \
+                                  "lu",   pc);                                                                \
                                                                                                               \
             pc     += 1 + sizeof(num_t);                                                                      \
             src_pc += (size_t)ncr;                                                                            \
@@ -57,7 +70,11 @@
             res_arr_ptr[pc]   = (char)(num^32);                                                               \
             memcpy(res_arr_ptr + pc + 1, &num_cmd, sizeof(int));                                              \
                                                                                                               \
-            PRINT_LOG_STR(fp_log, commands[num] + 4, "s", num_cmd, "d", num, "d", num_user, "lf", pc, "lu");  \
+            PRINT_LOG_STR(fp_log, "s",  commands[num] + 4,                                                    \
+                                  "d",  num_cmd,                                                              \
+                                  "d",  num,                                                                  \
+                                  "s",  "----",                                                               \
+                                  "lu", pc);                                                                  \
                                                                                                               \
             pc     += 1 + sizeof(int);                                                                        \
             src_pc += (size_t)ncr;                                                                            \
@@ -74,7 +91,11 @@
                 return ошибка_в_имени_регистра;                                                               \
             }                                                                                                 \
                                                                                                               \
-            PRINT_LOG_STR(fp_log, commands[num] + 4, "s", "----", "s", num, "d", name_cmd, "s", pc, "lu");    \
+            PRINT_LOG_STR(fp_log, "s",  commands[num] + 4,                                                    \
+                                  "s",  "----",                                                               \
+                                  "d",  num,                                                                  \
+                                  "s",  name_cmd,                                                             \
+                                  "lu", pc);                                                                  \
                                                                                                               \
             pc     += 2;                                                                                      \
             src_pc += (size_t)ncr;                                                                            \
@@ -84,11 +105,10 @@
 #define ASM_POP(pass_num, num)                                                                                \
     if (pass_num == 1)                                                                                        \
     {                                                                                                         \
-        if (sscanf(src_arr_ptr + src_pc, "[%d]" NUM_MOD_SCAN "\n%n", &num_cmd, &num_user, &ncr) == 2)         \
+        if (sscanf(src_arr_ptr + src_pc, "[%d]" "\n%n", &num_cmd, &ncr) == 1)                                 \
         {                                                                                                     \
-            printf("<<угадал\n");                                                                             \
             src_pc     += (size_t)ncr;                                                                        \
-            sz_res_arr += 1 + sizeof(num_t) + sizeof(int);                                                    \
+            sz_res_arr += 1 + sizeof(int);                                                                    \
         }                                                                                                     \
         else                                                                                                  \
         {                                                                                                     \
@@ -102,16 +122,19 @@
         PRINT_INFO("%s[%-2d]%s\n", MAGENTA, num, RESET);                                                      \
                                                                                                               \
                                                                                                               \
-        if (sscanf(src_arr_ptr + src_pc, "[%d]" NUM_MOD_SCAN "\n%n", &num_cmd, &num_user, &ncr) == 2)         \
+        if (sscanf(src_arr_ptr + src_pc, "[%d]" "\n%n", &num_cmd, &ncr) == 1)                                 \
         {                                                                                                     \
             res_arr_ptr[pc] = (char)(num^64);                                                                 \
                                                                                                               \
             memcpy(res_arr_ptr + pc + 1, &num_cmd, sizeof(int));                                              \
-            memcpy(res_arr_ptr + pc + sizeof(int) + 1, &num_user, sizeof(num_t));                             \
                                                                                                               \
-            PRINT_LOG_STR(fp_log, commands[num] + 4, "s", num_cmd, "d", num, "d", name_cmd, "s", pc, "lu");   \
+            PRINT_LOG_STR(fp_log, "s",  commands[num] + 4,                                                    \
+                                  "d",  num_cmd,                                                              \
+                                  "d",  num,                                                                  \
+                                  "s",  "----",                                                               \
+                                  "lu", pc);                                                                  \
                                                                                                               \
-            pc     += 2;                                                                                      \
+            pc     += 1 + sizeof(int);                                                                        \
             src_pc += (size_t)ncr;                                                                            \
         }                                                                                                     \
         else if (sscanf (src_arr_ptr + src_pc, "%s \n%n" , name_cmd, &ncr) == 1)                              \
@@ -125,7 +148,11 @@
                 return ошибка_в_имени_регистра;                                                               \
             }                                                                                                 \
                                                                                                               \
-            PRINT_LOG_STR(fp_log, commands[num] + 4, "s", "----", "s", num, "d", name_cmd, "s", pc, "lu");    \
+            PRINT_LOG_STR(fp_log, "s",  commands[num] + 4,                                                    \
+                                  "s",  "----",                                                               \
+                                  "d",  num,                                                                  \
+                                  "s",  name_cmd,                                                             \
+                                  "lu", pc);                                                                  \
                                                                                                               \
             pc     += 2;                                                                                      \
             src_pc += (size_t)ncr;                                                                            \
@@ -162,7 +189,11 @@
         }                                                                                                     \
         memcpy(res_arr_ptr + pc + 1, &num_cmd, sizeof(int));                                                  \
                                                                                                               \
-        PRINT_LOG_STR(fp_log, commands[num] + 4, "s", "----", "s", num, "d", num_cmd, "d", pc, "lu");         \
+        PRINT_LOG_STR(fp_log, "s",  commands[num] + 4,                                                        \
+                              "s",  "----",                                                                   \
+                              "d",  num,                                                                      \
+                              "d",  num_cmd,                                                                  \
+                              "lu", pc);                                                                      \
                                                                                                               \
         pc     += 1 + sizeof(int);                                                                            \
         src_pc += (size_t)ncr;                                                                                \
@@ -198,7 +229,11 @@
         for (int i = (int)pc + 1; i < num_cmd; i++)                                                           \
             res_arr_ptr[i] = 0;                                                                               \
                                                                                                               \
-        PRINT_LOG_STR(fp_log, commands[num] + 4, "s", "----", "s", num, "d", num_cmd, "d", "----", "s");      \
+        PRINT_LOG_STR(fp_log, "s", commands[num] + 4,                                                         \
+                              "s", "----",                                                                    \
+                              "d", num,                                                                       \
+                              "d", num_cmd,                                                                   \
+                              "s", "----");                                                                   \
                                                                                                               \
         pc = (size_t)num_cmd;                                                                                 \
         src_pc += (size_t)ncr;                                                                                \
@@ -206,8 +241,11 @@
 
 #endif // ASM_H
 
-
+/*------------------------------------------------------------------------------------------------------------*/
+/*PROCESSOR COMMANDS DESCRIPTION*/
+/*------------------------------------------------------------------------------------------------------------*/
 #ifdef PROCESSOR_H
+
 #define POP(num_ptr) StackPop(&str->stk_cmd, num_ptr);
 #define POP_PTR(ptr_id) StackPop(&str->stk_ptr, ptr_id);
 #define PUSH_PTR(ptr) StackPush(&str->stk_ptr, ptr);
@@ -230,147 +268,152 @@
 
 #define PROC_HLT(venom_prm) break;  
 
-#define PROC_PUSH(prm)                                                        \
-    if (num_cmd == prm^64)                                                       \
-    {                                                                         \
-        num_cmd = src_arr[pc + 1];                                            \
-        PUSH(*PTR_REG(num_cmd));                                              \
-        pc += 2;                                                              \
-                                                                              \
-        PRINT_INFO("Register from file: <%s>\n", REGISTER[(int)num_cmd]);     \
-        continue;                                                             \
-    }                                                                         \
-    else if (num_cmd == prm^32)\
-    {\
-        memcpy(&id_jmp, &src_arr[pc + 1], sizeof(int));\
-        memcpy(&RAM[id_jmp], &src_arr[pc + 1 + sizeof(int)], sizeof(num_t));\
-        pc += 1 + sizeof(int) + sizeof(num_t);\
-\
-        PRINT_INFO("RAM_ID = [%d]\n", id_jmp);\
-        PRINT_INFO("Numeric from file: <%.2lf>\n", (num_t)RAM[id_jmp]);                     \
-        continue;\
-    }\
-    else if (num_cmd == prm)                                               \
-    {                                                                         \
-        memcpy(&num1, src_arr + pc + 1, sizeof(num_t));                       \
-        PUSH(num1);                                                           \
-        pc += 1 + sizeof(num_t);                                              \
-                                                                              \
-        PRINT_INFO("Numeric from file: <%.2lf>\n", num1);                     \
-        continue;                                                             \
+#define PROC_PUSH(prm)                                                            \
+    if (num_cmd == (prm^64))                                                      \
+    {                                                                             \
+        num_cmd = src_arr[pc + 1];                                                \
+        PUSH(*PTR_REG(num_cmd));                                                  \
+        pc += 2;                                                                  \
+                                                                                  \
+        PRINT_INFO("Register from file: <%s>\n", REGISTER[(int)num_cmd]);         \
+        continue;                                                                 \
+    }                                                                             \
+    else if (num_cmd == (prm^32))                                                 \
+    {                                                                             \
+        memcpy(&id_jmp, &src_arr[pc + 1], sizeof(int));                           \
+        memcpy(&num1, &RAM[id_jmp], sizeof(num_t));                               \
+        PUSH(num1);                                                               \
+        pc += 1 + sizeof(int);                                                    \
+                                                                                  \
+        PRINT_INFO("RAM_ID = [%d]\n", id_jmp);                                    \
+        PRINT_INFO("Numeric from RAM: <%.2lf>\n", num1);                          \
+        continue;                                                                 \
+    }                                                                             \
+    else if (num_cmd == prm)                                                      \
+    {                                                                             \
+        memcpy(&num1, src_arr + pc + 1, sizeof(num_t));                           \
+        PUSH(num1);                                                               \
+        pc += 1 + sizeof(num_t);                                                  \
+                                                                                  \
+        PRINT_INFO("Numeric from file: <%.2lf>\n", num1);                         \
+        continue;                                                                 \
     }
 
-#define PROC_POP(prm)
-    if (num == prm) 
-    {
+#define PROC_POP(prm)                                                             \
+    if (num_cmd == prm)                                                           \
+    {                                                                             \
         num_cmd = src_arr[pc + 1];                                                \
         POP(PTR_REG(num_cmd));                                                    \
         pc += 2;                                                                  \
-                                                                                    \
+                                                                                  \
         PRINT_INFO("Register from file: <%s>\n", REGISTER[(int)num_cmd]);         \
-        continue;  
-    }
-    else if (num == prm^64)
-    {
-        
-        continue;
-    }                                                   \
+        continue;                                                                 \
+    }                                                                             \
+    else if (num_cmd == (prm^64))                                                 \
+    {                                                                             \
+        memcpy(&id_jmp, &src_arr[pc + 1], sizeof(int));                           \
+        POP(&num1);                                                               \
+        memcpy(&RAM[id_jmp], &num1, sizeof(num_t));                               \
+        pc += 1 + sizeof(int);                                                    \
+        PRINT_INFO("RAM_ID = [%d]\n", id_jmp);                                    \
+        continue;                                                                 \
+    }             
 
-#define PROC_IN(venom_prm)                                                    \
-    printf("Введите число: ");                                                \
-    fscanf(stdin, NUM_MOD_SCAN, &num1);                                       \
-    PUSH(num1);                                                               \
-    pc++;                                                                     \
-                                                                              \
-    PRINT_INFO("Numeric user: <%.2lf>\n", num1);                              \
+#define PROC_IN(venom_prm)                                                        \
+    printf("Введите число: ");                                                    \
+    fscanf(stdin, NUM_MOD_SCAN, &num1);                                           \
+    PUSH(num1);                                                                   \
+    pc++;                                                                         \
+                                                                                  \
+    PRINT_INFO("Numeric user: <%.2lf>\n", num1);                                  \
     continue;
 
-#define PROC_SQRT(venom_prm)                                                  \
-    POP(&num1);                                                               \
-    PUSH(sqrt(num1));                                                         \
-    pc++;                                                                     \
+#define PROC_SQRT(venom_prm)                                                      \
+    POP(&num1);                                                                   \
+    PUSH(sqrt(num1));                                                             \
+    pc++;                                                                         \
     continue;
 
-#define PROC_SIN(venom_prm)                                                   \
-    POP(&num1);                                                               \
-    PUSH(sin(num1));                                                          \
-    pc++;                                                                     \
+#define PROC_SIN(venom_prm)                                                       \
+    POP(&num1);                                                                   \
+    PUSH(sin(num1));                                                              \
+    pc++;                                                                         \
     continue;
 
-#define PROC_COS(venom_prm)                                                   \
-    POP(&num1);                                                               \
-    PUSH(cos(num1));                                                          \
-    pc++;                                                                     \
+#define PROC_COS(venom_prm)                                                       \
+    POP(&num1);                                                                   \
+    PUSH(cos(num1));                                                              \
+    pc++;                                                                         \
     continue;
 
-#define PROC_ADD(venom_prm)                                                   \
-    TWO_POP(num1, num2);                                                      \
-    PUSH(num2 + num1);                                                        \
-    pc++;                                                                     \
+#define PROC_ADD(venom_prm)                                                       \
+    TWO_POP(num1, num2);                                                          \
+    PUSH(num2 + num1);                                                            \
+    pc++;                                                                         \
     continue;
 
-#define PROC_SUB(venom_prm)                                                   \
-    TWO_POP(num1, num2);                                                      \
-    PUSH(num2 - num1);                                                        \
-    pc++;                                                                     \
+#define PROC_SUB(venom_prm)                                                       \
+    TWO_POP(num1, num2);                                                          \
+    PUSH(num2 - num1);                                                            \
+    pc++;                                                                         \
     continue;
 
-#define PROC_MUL(venom_prm)                                                   \
-    TWO_POP(num1, num2);                                                      \
-    PUSH(num2 * num1);                                                        \
-    pc++;                                                                     \
+#define PROC_MUL(venom_prm)                                                       \
+    TWO_POP(num1, num2);                                                          \
+    PUSH(num2 * num1);                                                            \
+    pc++;                                                                         \
     continue;
 
-#define PROC_DIV(venom_prm)                                                   \
-    TWO_POP(num1, num2);                                                      \
-    PUSH(num2 / num1);                                                        \
-    pc++;                                                                     \
+#define PROC_DIV(venom_prm)                                                       \
+    TWO_POP(num1, num2);                                                          \
+    PUSH(num2 / num1);                                                            \
+    pc++;                                                                         \
     continue;
 
-#define PROC_JMP(venom_prm)                                                   \
-    memcpy(&id_jmp, src_arr + pc + 1, sizeof(int));                           \
-    pc = (size_t)id_jmp;                                                      \
+#define PROC_JMP(venom_prm)                                                       \
+    memcpy(&id_jmp, src_arr + pc + 1, sizeof(int));                               \
+    pc = (size_t)id_jmp;                                                          \
     continue;
 
-#define PROC_JB(venom_prm)                                                    \
-    JMP_IF(num2 < num1, num1, num2);                                          \
+#define PROC_JB(venom_prm)                                                        \
+    JMP_IF(num2 < num1, num1, num2);                                              \
     continue;
 
-#define PROC_JBE(venom_prm)                                                   \
-    JMP_IF(num2 <= num1, num1, num2);                                         \
+#define PROC_JBE(venom_prm)                                                       \
+    JMP_IF(num2 <= num1, num1, num2);                                             \
     continue;
 
-#define PROC_JA(venom_prm)                                                    \
-    JMP_IF(num2 > num1, num1, num2);                                          \
-    continue;                                                                 \
+#define PROC_JA(venom_prm)                                                        \
+    JMP_IF(num2 > num1, num1, num2);                                              \
+    continue;                                                                     \
 
-#define PROC_JAE(venom_prm)                                                   \
-    JMP_IF(num2 >= num1, num1, num2);                                         \
+#define PROC_JAE(venom_prm)                                                       \
+    JMP_IF(num2 >= num1, num1, num2);                                             \
     continue;
 
-#define PROC_JE(venom_prm)                                                    \
-    JMP_IF(fabs(num2 - num1) < EPSILON, num1, num2);                          \
+#define PROC_JE(venom_prm)                                                        \
+    JMP_IF(fabs(num2 - num1) < EPSILON, num1, num2);                              \
     continue;
 
-#define PROC_JNE(venom_prm)                                                   \
-    JMP_IF(fabs(num2 - num1) > EPSILON, num1, num2);                          \
+#define PROC_JNE(venom_prm)                                                       \
+    JMP_IF(fabs(num2 - num1) > EPSILON, num1, num2);                              \
     continue;
 
-#define PROC_CALL(venom_prm)                                                  \
-    memcpy(&id_jmp, src_arr + pc + 1, sizeof(int));                           \
-    PUSH_PTR((ELEM_T)(pc + 1 + sizeof(int)));                                 \
-    pc = (size_t)id_jmp;                                                      \
+#define PROC_CALL(venom_prm)                                                      \
+    memcpy(&id_jmp, src_arr + pc + 1, sizeof(int));                               \
+    PUSH_PTR((ELEM_T)(pc + 1 + sizeof(int)));                                     \
+    pc = (size_t)id_jmp;                                                          \
     continue;
 
-#define PROC_RET(venom_prm)                                                   \
-    POP_PTR(&num1);                                                           \
-    pc = (size_t)num1;                                                        \
+#define PROC_RET(venom_prm)                                                       \
+    POP_PTR(&num1);                                                               \
+    pc = (size_t)num1;                                                            \
     continue;
 
-#define PROC_OUT(venom_prm)                                                   \
-    POP(&num1);                                                               \
-    printf("%sОтвет: [%.2lf]%s\n", YELLOW, num1, RESET);                      \
-    pc++;                                                                     \
+#define PROC_OUT(venom_prm)                                                       \
+    POP(&num1);                                                                   \
+    printf("%sОтвет: [%.2lf]%s\n", YELLOW, num1, RESET);                          \
+    pc++;                                                                         \
     continue;
 
 #define PROC_VENOM(prm_venom) {};

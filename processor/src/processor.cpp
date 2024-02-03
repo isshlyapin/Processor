@@ -3,6 +3,8 @@
 
 int process_commands(FILE *fp_src, Storage *str)
 {
+    char *RAM = str->RAM;
+
     #include "../../library/cmd_define.h"
     
     #define NEW_INSTRUCTIONS(name, num, ASM_CMD, DASM_CMD, PROC_CMD)   \
@@ -11,7 +13,7 @@ int process_commands(FILE *fp_src, Storage *str)
             PROC_CMD(num);                                             \
         }
 
-    PRINT_INFO("\n___%sWORKING PROCESSOR%s___\n\n", GREEN, RESET);
+    PRINT_INFO("\n%s___WORKING PROCESSOR___%s\n\n", GREEN, RESET);
 
     struct Array *src_struct_arr = ctor_struct_arr(fp_src);
     assert(src_struct_arr != NULL);

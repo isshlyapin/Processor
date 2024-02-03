@@ -11,7 +11,6 @@
 #include "../../library/config.h"
 #include "../../library/commands.h"
 #include "../../library/error.h"
-#include "../include/log.h"
 
 #include "../../library/color.h"
 
@@ -39,18 +38,15 @@ size_t search_size_file(FILE *fp_src);
 
 int check_num_reg(const char *str);
 
-void create_log_str(char *str, int flag, const char *info);
+// void create_log_str(char *str, int flag, const char *info);
 
-char *itoa(void *num_ptr, char *str_res, char type);
+// char *itoa(void *num_ptr, char *str_res, char type);
 
 
 // DEFINE LIST
 
 #ifdef LOG
     #include "./log.h"
-
-    void print_log_partition(FILE *fp_log);
-    void print_log_title(FILE *fp_log);
 
     #define PRINT_LOG_PARTITION(fp) print_log_partition(fp)
     #define PRINT_LOG_TITLE(fp)     print_log_title(fp)
@@ -62,7 +58,7 @@ char *itoa(void *num_ptr, char *str_res, char type);
 
     #define CLOSE_LOG_FILE() fclose(fp_log)
     
-    #define PRINT_LOG_STR(fp, col1, tp1, col2, tp2, col3, tp3, col4, tp4, col5, tp5)    \
+    #define PRINT_LOG_STR(fp, tp1, col1, tp2, col2, tp3, col3, tp4, col4, tp5, col5)    \
         fprintf(fp, "|%*s%*" tp1 "|",   INDENT_COL, " ", -WIDTH_COL, col1);             \
         fprintf(fp, "%*s%*"  tp2 "|",   INDENT_COL, " ", -WIDTH_COL, col2);             \
         fprintf(fp, "%*s%*"  tp3 "|",   INDENT_COL, " ", -WIDTH_COL, col3);             \
@@ -75,10 +71,10 @@ char *itoa(void *num_ptr, char *str_res, char type);
     #define PRINT_LOG_PARTITION(...) {}
     #define PRINT_LOG_TITLE(...)     {}
     #define PRINT_LOG_STR(...)       {}    
-#endif // DEBUG
+#endif // LOG
 
 #define NUM_CMD_EQUALS_JMP_OR_CALL(num_cmd) ((num_cmd >= cmd_jmp) && (num_cmd <= cmd_jne)) || (num_cmd == cmd_call)
 
 #define ORG_NOT_CORRECT(org_id, current_pc) ((size_t)org_id < current_pc) || (org_id < 0)
 
-#endif
+#endif // ASM_H

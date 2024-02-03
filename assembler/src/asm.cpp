@@ -8,7 +8,7 @@ int main(int argc, char *argv[])
         CHECK_ARGC(argc, 3);
     #endif
 
-    PRINT_INFO("\n___%sWORKING ASSEMBLER%s___\n\n", RED, RESET);
+    PRINT_INFO("\n%s___WORKING ASSEMBLER___%s\n\n", RED, RESET);
 
     OPEN_LOG_FIlE();
 
@@ -33,14 +33,13 @@ int create_byte_code(FILE *fp_src, FILE *fp_res)
 
     PRINT_LOG_TITLE(fp_log);
 
-    struct Array *src_struct_arr = ctor_struct_arr(fp_src);
-    
+    struct Array *src_struct_arr = ctor_struct_arr(fp_src);    
     assert(src_struct_arr != NULL);
 
     struct Array *res_struct_arr = (struct Array*)calloc(1, sizeof(struct Array));
     assert(res_struct_arr != NULL);
 
-    struct Label *arr_label = (struct Label*)calloc(100, sizeof(struct Label));
+    struct Label *arr_label = (struct Label*)calloc(100, sizeof(struct Label)); //TODO Кол-во меток в константу
     assert(arr_label != NULL);
 
     assembly(src_struct_arr, res_struct_arr, arr_label, 1);
@@ -48,7 +47,11 @@ int create_byte_code(FILE *fp_src, FILE *fp_res)
 
     res_struct_arr->arr_ptr[res_struct_arr->size_arr] = (char)cmd_hlt;
     
-    PRINT_LOG_STR(fp_log, commands[cmd_hlt] + 4, "s", "----", "s", cmd_hlt, "d", "----", "s", res_struct_arr->size_arr, "lu");
+    PRINT_LOG_STR(fp_log, "s",  commands[cmd_hlt] + 4,
+                          "s",  "----",
+                          "d",  cmd_hlt,
+                          "s",  "----",
+                          "lu", res_struct_arr->size_arr);
 
     PRINT_INFO("name_cmd: %s[%4s]%s", RED, "hlt", RESET);
     PRINT_INFO("%s[%2d]%s\n", MAGENTA, cmd_hlt, RESET);
@@ -120,7 +123,7 @@ int assembly(struct Array *src_struct_arr, struct Array *res_struct_arr, struct 
     {
         bool check_cmd = false;
 
-        int ncr      = 0;  // ncr - number of characters read}
+        int ncr      = 0;  // ncr - number of characters read
         int num_cmd  = 0;
         
         char name_cmd[MAX_SIZE_STR] = "VENOM";
@@ -132,7 +135,7 @@ int assembly(struct Array *src_struct_arr, struct Array *res_struct_arr, struct 
             return ошибка_чтения_команды;
         }
         
-        if (strcmp(name_cmd, "#") == 0)
+        if (name_cmd[0] == '#')
         {
             while(src_arr_ptr[src_pc] != '\n')
                 src_pc++;
@@ -154,8 +157,6 @@ int assembly(struct Array *src_struct_arr, struct Array *res_struct_arr, struct 
         }
         else
             src_pc += (size_t)ncr;
-
-        printf(">>%s\n", name_cmd);
 
         #include "../../library/instructions_def.h"
 

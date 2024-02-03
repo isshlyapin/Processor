@@ -1,5 +1,15 @@
-pop [25] 13
-pop [193] 12
+push 10
+push 12
+push 792
+push 397
+
+pop [25]
+pop [193]
 
 push [25]
 push [193]
+
+out
+out 
+out
+out
