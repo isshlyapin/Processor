@@ -19,7 +19,10 @@ integer-divide-by-zero,leak,nonnull-attribute,null,object-size,return,\
 returns-nonnull-attribute,shift,signed-integer-overflow,undefined,\
 unreachable,vla-bound,vptr"
 
-ASM_START_FILE="program-txt/src/ram_test.txt program-txt/res/res_asm.txt log/log_test.txt"
+ASM_SRC_FILE="ram_test.txt"
+ASM_LOG_FILE="log_file.txt"
+
+ASM_START_STR="program-txt/src/$ASM_SRC_FILE program-txt/res/res_asm.txt log/$ASM_LOG_FILE"
 PROC_START_FILE="program-txt/res/res_asm.txt"
 
 PATH_ASM_SRC="assembler/src/asm.cpp"
@@ -45,9 +48,10 @@ fi
  
 FILE=asm
 if test -f "$FILE"; then
-    bin/asm $ASM_START_FILE
+    bin/asm $ASM_START_STR
 else
-    g++ $CXXFLAGS $PATH_ASM_SRC -o bin/asm && bin/asm $ASM_START_FILE
+    g++ $CXXFLAGS $PATH_ASM_SRC -o bin/asm || exit 1;
+    bin/asm $ASM_START_STR || exit 1
 fi
 
 FILE=program-txt/res/res_asm.txt

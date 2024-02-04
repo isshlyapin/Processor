@@ -1,12 +1,11 @@
 #ifndef COMMANDS_H
 #define COMMANDS_H 
 
-// #include <stdio.h>
-
 #define NEW_INSTRUCTIONS(name, num, ...) name = num,
 
 enum commands{
     #include "instructions_def.h"
+
     #undef NEW_DIRECTIVE
     #undef NEW_INSTRUCTIONS
     #undef ENUM
@@ -18,6 +17,7 @@ enum commands{
 
 static const char *commands[] = {
     #include "instructions_def.h"
+    
     #undef NEW_DIRECTIVE
     #undef NEW_INSTRUCTIONS
     
@@ -33,14 +33,15 @@ enum REGISTER{
 
 #ifndef ASM_H
 #ifdef INFO
+
 static const char* REGISTER[] = {
     "rax",
     "rbx",
     "rcx",
     "rdx",
 };
-#endif
 
+#endif // !INFO
 #endif // !ASM_H
 
 #endif // !COMMANDS_H

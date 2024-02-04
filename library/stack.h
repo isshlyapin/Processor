@@ -16,14 +16,15 @@ const double VENOM_ELEM = -13;
 const size_t VENOM_SIZE = 0;
 
 const size_t REALLOC_FACTOR_DECREASE = 2;
-const size_t REALLOC_DECREASE_CHECK = 4;
+const size_t REALLOC_DECREASE_CHECK  = 4;
 
 #define ELEM_MOD "%.2lf"
 typedef double ELEM_T;
 
 #ifdef DEBUG_CHECK
-    const unsigned long long CANARY = 0xab0baab0baab0ba;
+    const unsigned long long CANARY     = 0xab0baab0baab0ba;
     const unsigned long long CANARY_STR = 0xdeaddeaddeaddead;
+ 
     typedef unsigned long long CANARY_T;
     typedef unsigned long long HASH_TYPE;
 #endif
@@ -35,6 +36,7 @@ enum code_error
     STACK_DATA_ERR,
     STACK_SIZE_ERR,
     STACK_CAPACITY_ERR,
+
 #ifdef DEBUG_CHECK
     STACK_HASH_ERR,
     STACK_CANARY_ERR,
@@ -48,17 +50,18 @@ enum code_error
 
 struct Stack
 {
-#ifdef DEBUG_CHECK
-    CANARY_T canary_str_l;
-#endif
+    #ifdef DEBUG_CHECK
+        CANARY_T canary_str_l;
+    #endif
+    
     size_t size;
     ELEM_T *data;
     size_t capacity;
-#ifdef DEBUG_CHECK
-    const CANARY_T STACK_VALUE_DEFAULT = 0;
-    HASH_TYPE hash = STACK_VALUE_DEFAULT;
-    CANARY_T canary_str_r;
-#endif
+    #ifdef DEBUG_CHECK
+        const CANARY_T STACK_VALUE_DEFAULT = 0;
+        HASH_TYPE hash = STACK_VALUE_DEFAULT;
+        CANARY_T canary_str_r;
+    #endif
 };
 
 int StackCtor(Stack *stk, size_t capacity);
@@ -70,7 +73,7 @@ int StackPop(Stack *stk, ELEM_T *num);
 int StackReallocIncrease(Stack *stk);
 int StackReallocDecrease(Stack *stk);
 
-int *stack_verification(Stack *stk, const char* name_func);
+int  *stack_verification(Stack *stk, const char* name_func);
 void stack_dump(Stack *stk, int *code_error, const char *file_err, const char *func_err, const int line_err);
 void sort_output_error(Stack *stk, int error);
 
@@ -99,4 +102,4 @@ HASH_TYPE hash_crc_32 (char *message);
     free(code_err);                                                  \
 }         
 
-#endif
+#endif // !STACK_HEADER

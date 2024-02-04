@@ -13,7 +13,7 @@
 
 #include "../../library/color.h"
 
-static const double EPSILON = 1e-9;
+static const double EPSILON    = 1e-9;
 static const size_t AMOUNT_RAM = 1024*1024*1024;
 
 // STRUCT LIST
@@ -64,4 +64,4 @@ size_t search_size_file(FILE *fp_src);
         free(code_err);                                                            \
     }
 
-#endif
+#endif // !PROCESSOR_H

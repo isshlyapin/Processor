@@ -22,7 +22,7 @@ int process_commands(FILE *fp_src, Storage *str)
 
     for (size_t pc = 0; pc < src_struct_arr->size_arr; )
     {
-        char num_cmd   = src_arr[pc];
+        char num_cmd = src_arr[pc];
 
         PRINTF_INFO_CMD();
 
@@ -31,7 +31,8 @@ int process_commands(FILE *fp_src, Storage *str)
         int id_jmp = 0;
         
         #include "../../library/instructions_def.h"
- 
+
+        // В конце каждой команды добавлено continue(команды добавляются директивой include выше)
         if (true)
         {
             PRINT_ERROR("%s\n", ERROR_TEXT[ошибка_обработки_команды_процессором]);

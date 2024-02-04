@@ -11,6 +11,7 @@ static const int WIDTH_COL   = 13;
 static const int AMOUNT_COL  = 5;
 
 void print_log_partition(FILE *fp_log);
+
 void print_log_title(FILE* fp_log);
 
 #endif // LOG_H

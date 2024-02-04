@@ -15,7 +15,7 @@
 #include "../../library/color.h"
 
 
-// STRUCT LIST
+// Список структур
 struct Array {
     char   *arr_ptr;
     size_t size_arr;
@@ -27,7 +27,7 @@ struct Label {
 };
 
 
-// FUNCTIONS LIST
+// Блок функций
 int create_byte_code(FILE *fp_src, FILE *fp_res);
 
 int assembly(struct Array *src_struct_arr, struct Array *res_struct_arr, struct Label *arr_lab, int pass_num);
@@ -38,13 +38,8 @@ size_t search_size_file(FILE *fp_src);
 
 int check_num_reg(const char *str);
 
-// void create_log_str(char *str, int flag, const char *info);
 
-// char *itoa(void *num_ptr, char *str_res, char type);
-
-
-// DEFINE LIST
-
+// Блок директив #define
 #ifdef LOG
     #include "./log.h"
 

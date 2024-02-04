@@ -6,10 +6,13 @@ push 397
 pop [25]
 pop [193]
 
+#проверка связи
 push [25]
 push [193]
+#Ну а вдруг
 
 out
-out 
+out
+#А что если... 
 out
 out

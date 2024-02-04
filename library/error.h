@@ -51,4 +51,4 @@ static const char *ERROR_TEXT[] = {
         return ошибка_количество_аргументов_командной_строки;                                    \
     }
     
-#endif
+#endif // !ERROR_H

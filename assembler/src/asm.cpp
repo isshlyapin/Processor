@@ -139,7 +139,6 @@ int assembly(struct Array *src_struct_arr, struct Array *res_struct_arr, struct 
         {
             while(src_arr_ptr[src_pc] != '\n')
                 src_pc++;
-            src_pc++;
             continue;
         }        
         else if (name_cmd[0] == ':')

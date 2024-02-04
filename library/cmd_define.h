@@ -1,9 +1,8 @@
 #ifndef CMD_DEFINE_H
 #define CMD_DEFINE_H
 
-
 /*------------------------------------------------------------------------------------------------------------*/
-/*ASSEMBLER COMMANDS DESCRIPTION*/
+/*                               ASSEMBLER COMMANDS DESCRIPTION                                               */
 /*------------------------------------------------------------------------------------------------------------*/
 #ifdef ASM_H
 
@@ -82,6 +81,7 @@
         else                                                                                                  \
         {                                                                                                     \
             sscanf (src_arr_ptr + src_pc, "%s \n%n", name_cmd, &ncr);                                         \
+                                                                                                              \
             res_arr_ptr[pc]   = (char)(num^64);                                                               \
             res_arr_ptr[pc+1] = (char)check_num_reg(name_cmd);                                                \
                                                                                                               \
@@ -121,7 +121,6 @@
         PRINT_INFO("name_cmd: %s[%-4s]%s", RED, name_cmd, RESET);                                             \
         PRINT_INFO("%s[%-2d]%s\n", MAGENTA, num, RESET);                                                      \
                                                                                                               \
-                                                                                                              \
         if (sscanf(src_arr_ptr + src_pc, "[%d]" "\n%n", &num_cmd, &ncr) == 1)                                 \
         {                                                                                                     \
             res_arr_ptr[pc] = (char)(num^64);                                                                 \
@@ -139,9 +138,9 @@
         }                                                                                                     \
         else if (sscanf (src_arr_ptr + src_pc, "%s \n%n" , name_cmd, &ncr) == 1)                              \
         {                                                                                                     \
-            res_arr_ptr[pc] = (char)num;                                                                      \
-                                                                                                              \
+            res_arr_ptr[pc]   = (char)num;                                                                    \
             res_arr_ptr[pc+1] = (char)check_num_reg(name_cmd);                                                \
+                                                                                                              \
             if (res_arr_ptr[pc+1] == ошибка_в_имени_регистра)                                                 \
             {                                                                                                 \
                 PRINT_ERROR("%s\n", ERROR_TEXT[ошибка_в_имени_регистра]);                                     \
@@ -178,6 +177,7 @@
         if (sscanf(src_arr_ptr + src_pc, "%d \n%n", &num_cmd, &ncr) != 1)                                     \
         {                                                                                                     \
             sscanf(src_arr_ptr + src_pc, "%s \n%n", name_cmd, &ncr);                                          \
+                                                                                                              \
             for (int i = 1; i <= arr_lab[0].jmp_id; i++)                                                      \
             {                                                                                                 \
                 if (!strcmp(arr_lab[i].name_lab, name_cmd))                                                   \
@@ -239,18 +239,19 @@
         src_pc += (size_t)ncr;                                                                                \
     }
 
-#endif // ASM_H
+#endif // !ASM_H
+
 
 /*------------------------------------------------------------------------------------------------------------*/
-/*PROCESSOR COMMANDS DESCRIPTION*/
+/*                                   PROCESSOR COMMANDS DESCRIPTION                                           */
 /*------------------------------------------------------------------------------------------------------------*/
 #ifdef PROCESSOR_H
 
-#define POP(num_ptr) StackPop(&str->stk_cmd, num_ptr);
+#define POP(num_ptr)    StackPop(&str->stk_cmd, num_ptr);
 #define POP_PTR(ptr_id) StackPop(&str->stk_ptr, ptr_id);
-#define PUSH_PTR(ptr) StackPush(&str->stk_ptr, ptr);
-#define PUSH(num) StackPush(&str->stk_cmd, num);
-#define PTR_REG(id) ptr_reg(str, id)
+#define PUSH_PTR(ptr)   StackPush(&str->stk_ptr, ptr);
+#define PUSH(num)       StackPush(&str->stk_cmd, num);
+#define PTR_REG(id)     ptr_reg(str, id)
 
 #define TWO_POP(num1, num2)                                                       \
     StackPop(&str->stk_cmd, &num1);                                               \
@@ -421,7 +422,11 @@
 #endif // !PROCESSOR_H
 
 
+/*------------------------------------------------------------------------------------------------------------*/
+/*                                   DISASSEMBLER COMMANDS DESCRIPTION                                        */
+/*------------------------------------------------------------------------------------------------------------*/
 #ifdef DASM_H
+
 #define DASM_CMD_WITHOUT_PRM(prm)                                                          \
     fprintf(fp_res, "%s\n", commands[prm] + 4);                                            \
     pc++;                                                                                  \
