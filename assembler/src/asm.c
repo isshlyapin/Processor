@@ -126,7 +126,7 @@ int assembly(struct Array *src_struct_arr, struct Array *res_struct_arr, struct 
         int ncr      = 0;  // ncr - number of characters read
         int num_cmd  = 0;
         
-        char name_cmd[MAX_SIZE_STR] = "VENOM";
+        char name_cmd[100] = "VENOM";
 
         bool read_cmd = sscanf(src_arr_ptr + src_pc, "%s %n", name_cmd, &ncr);
         if (!read_cmd)

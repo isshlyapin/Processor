@@ -17,12 +17,12 @@ static const double EPSILON    = 1e-9;
 static const size_t AMOUNT_RAM = 1024*1024*1024;
 
 // STRUCT LIST
-struct Storage {
+typedef struct Storage {
     Stack stk_cmd;
     Stack stk_ptr;
     char  *RAM;
     num_t regs[4];
-};
+} Storage;
 
 struct Array{
     char   *arr_ptr;

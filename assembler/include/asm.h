@@ -7,6 +7,7 @@
 #include <string.h>
 #include <assert.h>
 #include <math.h>
+#include <stdbool.h>
 
 #include "../../library/config.h"
 #include "../../library/commands.h"
@@ -22,7 +23,7 @@ struct Array {
 };
 
 struct Label {
-    char name_lab[MAX_SIZE_STR];
+    char name_lab[100];
     int jmp_id;
 };
 
