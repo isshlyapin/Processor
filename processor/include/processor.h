@@ -37,7 +37,7 @@ int StorageDtor(Storage *str);
 
 int process_commands(FILE *fp_src, Storage *str);
 
-int StorageDump(Storage *str, const char *file_err, const char *func_err, const int line_err);
+// int StorageDump(Storage *str, const char *file_err, const char *func_err, const int line_err);
 
 num_t *ptr_reg(Storage *str, int id_reg);
 
@@ -54,7 +54,7 @@ size_t search_size_file(FILE *fp_src);
 #else
     #define PRINTF_INFO_CMD() {};
 #endif
-
+/*
 #define STORAGE_DUMP(storage) StorageDump(storage, __FILE__, __func__, __LINE__);
 
 #define STACK_DUMP(stack)                                                          \
@@ -63,5 +63,5 @@ size_t search_size_file(FILE *fp_src);
         stack_dump(stack, code_err, __FILE__, __func__, __LINE__);                 \
         free(code_err);                                                            \
     }
-
+*/
 #endif // !PROCESSOR_H

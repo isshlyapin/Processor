@@ -1,18 +1,35 @@
-push 10
-push 12
-push 792
-push 397
+push 111
+push 111
+push 111
+push 111
 
-pop [25]
-pop [193]
+pop rax
+pop rbx
+pop rcx
+pop rdx
 
-#проверка связи
-push [25]
-push [193]
-#Ну а вдруг
+push 100
+pop[rax + 111]
 
+push 200
+pop[rbx * 3]
+
+push 300
+pop[rcx - 12]
+
+push 400
+pop[rdx / 111]
+
+push[rax + 111]
+out 
+
+push[rbx * 3]
+out 
+
+push[rcx - 12]
 out
+
+push[rdx / 111]
 out
-#А что если... 
-out
-out
+
+hlt

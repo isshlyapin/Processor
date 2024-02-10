@@ -8,6 +8,7 @@
 #include <assert.h>
 #include <math.h>
 #include <stdbool.h>
+#include <ctype.h>
 
 #include "../../library/config.h"
 #include "../../library/commands.h"

@@ -8,7 +8,7 @@ int process_commands(FILE *fp_src, Storage *str)
     #include "../../library/cmd_define.h"
     
     #define NEW_INSTRUCTIONS(name, num, ASM_CMD, DASM_CMD, PROC_CMD)   \
-        if (num == (num_cmd & 31))                                     \
+        if (num == (num_cmd & 0x1F))                                     \
         {                                                              \
             PROC_CMD(num);                                             \
         }
@@ -23,7 +23,8 @@ int process_commands(FILE *fp_src, Storage *str)
     for (size_t pc = 0; pc < src_struct_arr->size_arr; )
     {
         char num_cmd = src_arr[pc];
-
+        char sign = '\0';
+        
         PRINTF_INFO_CMD();
 
         num_t num1 = VENOM_ELEM;
@@ -32,8 +33,7 @@ int process_commands(FILE *fp_src, Storage *str)
         
         #include "../../library/instructions_def.h"
 
-        // В конце каждой команды добавлено continue(команды добавляются директивой include выше)
-        if (true)
+        // else
         {
             PRINT_ERROR("%s\n", ERROR_TEXT[ошибка_обработки_команды_процессором]);
             return ошибка_обработки_команды_процессором;
@@ -50,7 +50,6 @@ struct Array *ctor_struct_arr(FILE *fp_src)
 {
     struct Array *new_struct_arr = (struct Array*)malloc(sizeof(struct Array));
 
-    long   start_ptr_file = ftell(fp_src);
     size_t sz_file        = search_size_file(fp_src);
     char   *array         = (char*)calloc(sz_file + 1, sizeof(char));
 
@@ -59,7 +58,6 @@ struct Array *ctor_struct_arr(FILE *fp_src)
     new_struct_arr->arr_ptr  = array;
     new_struct_arr->size_arr = sz_file;
     
-    fseek(fp_src, start_ptr_file, SEEK_SET);
     return new_struct_arr;
 }
 
@@ -78,10 +76,11 @@ size_t search_size_file(FILE *fp_src)
 
 int StorageCtor(Storage *str)
 {
-    StackCtor(&str->stk_cmd, STD_STACK_CAP);
-    StackCtor(&str->stk_ptr, STD_STACK_CAP);
+    StackCtor(&(str->stk_cmd), STD_STACK_CAP);
+    StackCtor(&(str->stk_ptr), STD_STACK_CAP);
+    
     str->RAM = (char *)calloc(AMOUNT_RAM, sizeof(char));
-
+    
     str->regs[rax] = VENOM_ELEM;
     str->regs[rbx] = VENOM_ELEM;
     str->regs[rcx] = VENOM_ELEM;
@@ -92,10 +91,11 @@ int StorageCtor(Storage *str)
 
 int StorageDtor(Storage *str) 
 {
-    StackDtor(&str->stk_cmd);
-    StackDtor(&str->stk_ptr);
+    StackDtor(&(str->stk_ptr));
+    StackDtor(&(str->stk_cmd));
+
     free(str->RAM);
-    
+
     str->regs[rax] = VENOM_ELEM;
     str->regs[rbx] = VENOM_ELEM;
     str->regs[rcx] = VENOM_ELEM;
@@ -104,23 +104,23 @@ int StorageDtor(Storage *str)
     return ошибок_нет;
 }
 
-int StorageDump(Storage *str, const char *file_err, const char *func_err, const int line_err)
-{
-    fprintf(stderr, "----------------------------------------------------------------------------\n");
-    
-    fprintf(stderr, "Storage[%p] \"str\" called from %s(%d) %s\n", str, file_err, line_err, func_err);
-    
-    fprintf(stderr, "----------------------------------------------------------------------------\n");
-    
-    fprintf(stderr, "Register [rax] = " ELEM_MOD "\n", str->regs[rax]);
-    fprintf(stderr, "Register [rbx] = " ELEM_MOD "\n", str->regs[rbx]);
-    fprintf(stderr, "Register [rcx] = " ELEM_MOD "\n", str->regs[rcx]);
-    fprintf(stderr, "Register [rdx] = " ELEM_MOD "\n", str->regs[rdx]);
-    
-    STACK_DUMP(&str->stk_cmd);
-    STACK_DUMP(&str->stk_ptr);
-
-    return ошибок_нет;
-}
+// int StorageDump(Storage *str, const char *file_err, const char *func_err, const int line_err)
+// {
+//     fprintf(stderr, "----------------------------------------------------------------------------\n");
+//     
+//     fprintf(stderr, "Storage[%p] \"str\" called from %s(%d) %s\n", str, file_err, line_err, func_err);
+//     
+//     fprintf(stderr, "----------------------------------------------------------------------------\n");
+//     
+//     fprintf(stderr, "Register [rax] = " ELEM_MOD "\n", str->regs[rax]);
+//     fprintf(stderr, "Register [rbx] = " ELEM_MOD "\n", str->regs[rbx]);
+//     fprintf(stderr, "Register [rcx] = " ELEM_MOD "\n", str->regs[rcx]);
+//     fprintf(stderr, "Register [rdx] = " ELEM_MOD "\n", str->regs[rdx]);
+//     
+//     STACK_DUMP(&str->stk_cmd);
+//     STACK_DUMP(&str->stk_ptr);
+//
+//     return ошибок_нет;
+// }
 
 num_t *ptr_reg(Storage *str, int id_reg) { return &str->regs[id_reg]; }

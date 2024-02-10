@@ -1,4 +1,5 @@
 #include "../include/asm.h"
+#include <stdio.h>
 
 int main(int argc, char *argv[])
 {
@@ -53,8 +54,8 @@ int create_byte_code(FILE *fp_src, FILE *fp_res)
                           "s",  "----",
                           "lu", res_struct_arr->size_arr);
 
-    PRINT_INFO("name_cmd: %s[%4s]%s", RED, "hlt", RESET);
-    PRINT_INFO("%s[%2d]%s\n", MAGENTA, cmd_hlt, RESET);
+    PRINT_INFO("name_cmd: %s[%-4s]%s", RED, "hlt", RESET);
+    PRINT_INFO("%s[%-2d]%s\n", MAGENTA, cmd_hlt, RESET);
 
     fwrite(res_struct_arr->arr_ptr, sizeof(char), res_struct_arr->size_arr + 1, fp_res);
 
@@ -123,25 +124,71 @@ int assembly(struct Array *src_struct_arr, struct Array *res_struct_arr, struct 
     {
         bool check_cmd = false;
 
-        int ncr      = 0;  // ncr - number of characters read
         int num_cmd  = 0;
         
         char name_cmd[100] = "VENOM";
-
-        bool read_cmd = sscanf(src_arr_ptr + src_pc, "%s %n", name_cmd, &ncr);
-        if (!read_cmd)
-        {
-            PRINT_ERROR("%s\n", ERROR_TEXT[ошибка_чтения_команды]);
-            return ошибка_чтения_команды;
-        }
         
-        if (name_cmd[0] == '#')
+        int ncr = 0;  // ncr - number of characters read
+        char ch = src_arr_ptr[src_pc];
+        
+        if (ch == '#')
         {
-            while(src_arr_ptr[src_pc] != '\n')
+            while((ch != '\n') && (ch != '\0'))
+            {
                 src_pc++;
+                ch = src_arr_ptr[src_pc];
+            }
+            
+            if (ch == '\0')
+                break;
+            
+            src_pc++;
             continue;
-        }        
-        else if (name_cmd[0] == ':')
+        }
+        else if ((isalpha(ch) == 0) && (ch != ':') && (ch != '#'))
+        {
+            while ((isalpha(ch) == 0) && (ch != ':') && (ch != '#') && (ch != '\0'))
+            {
+                src_pc++;
+                ch = src_arr_ptr[src_pc];
+            }
+            
+            if (ch == '\0')
+                break;
+            else
+                continue;
+        }
+
+        while ((ch != ' ') && (ch != '\n') && (ch != '[') && (ch != '\0'))
+        {
+            name_cmd[ncr] = ch;
+            ncr++;
+            src_pc++;
+            ch = src_arr_ptr[src_pc];
+        }
+        name_cmd[ncr] = '\0';
+        ncr = 0;
+
+        // printf("<<%s>>\n", name_cmd);
+        // src_pc += ncr + 1;
+        // ncr = 0;
+
+        // bool read_cmd = sscanf(src_arr_ptr + src_pc, "%s %n", name_cmd, &ncr);
+        // if (!read_cmd)
+        // {
+        //     PRINT_ERROR("%s\n", ERROR_TEXT[ошибка_чтения_команды]);
+        //     printf("<<%s>>\n", name_cmd);
+        //     return ошибка_чтения_команды;
+        // }
+        
+        // if (name_cmd[0] == '#')
+        // {
+        //     while(src_arr_ptr[src_pc] != '\n')
+        //         src_pc++;
+        //     src_pc++;
+        //     continue;
+        // }        
+        if (name_cmd[0] == ':')
         {
             if (pass_num == 1)
             {
@@ -151,11 +198,9 @@ int assembly(struct Array *src_struct_arr, struct Array *res_struct_arr, struct 
                 strncpy(arr_lab[index_lab].name_lab, name_cmd + 1, MAX_SIZE_STR - 1);
                 index_lab++;
             }
-            src_pc += (size_t)ncr;
             continue;             
         }
-        else
-            src_pc += (size_t)ncr;
+        ncr = 0;
 
         #include "../../library/instructions_def.h"
 

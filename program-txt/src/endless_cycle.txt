@@ -1,13 +1,17 @@
 push 1
 pop rax
+
 push rax
 push rax
 mul
+
 pop rdx
 push rdx
 out
+
 push rax
 push 1
 add
 pop rax
-jmp 4
+
+jmp 0

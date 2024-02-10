@@ -23,10 +23,13 @@ static const size_t REALLOC_DECREASE_CHECK = 4;
 typedef double ELEM_T;
 
 #ifdef DEBUG_CHECK
-static const unsigned long long CANARY = 0xab0baab0baab0ba;
+static const unsigned long long CANARY     = 0xab0baab0baab0ba;
 static const unsigned long long CANARY_STR = 0xdeaddeaddeaddead;
+
 typedef unsigned long long CANARY_T;
 typedef unsigned long long HASH_TYPE;
+
+static const CANARY_T STACK_VALUE_DEFAULT  = 0;
 #endif
 
 enum code_error
@@ -56,8 +59,7 @@ typedef struct Stack
 	ELEM_T *data;
 	size_t capacity;
 #ifdef DEBUG_CHECK
-	const CANARY_T STACK_VALUE_DEFAULT = 0;
-	HASH_TYPE hash = STACK_VALUE_DEFAULT;
+	HASH_TYPE hash;
 	CANARY_T canary_str_r;
 #endif
 } Stack;
@@ -71,11 +73,11 @@ int StackPop(Stack *stk, ELEM_T *num);
 int StackReallocIncrease(Stack *stk);
 int StackReallocDecrease(Stack *stk);
 
-int *stack_verification(Stack *stk, const char* name_func);
-void stack_dump(Stack *stk, int *code_error, const char *file_err, const char *func_err, const int line_err);
-void sort_output_error(Stack *stk, int error);
+// int *stack_verification(Stack *stk, const char* name_func);
+// void stack_dump(Stack *stk, int *code_error, const char *file_err, const char *func_err, const int line_err);
+// void sort_output_error(Stack *stk, int error);
 
-ELEM_T *my_memset(ELEM_T *destination, ELEM_T elem, size_t size);
+// ELEM_T *my_memset(ELEM_T *destination, ELEM_T elem, size_t size);
 
 #ifdef DEBUG_CHECK
 CANARY_T *search_data_right_canary(Stack *stk);
@@ -89,6 +91,7 @@ size_t conversion_bin_sys(size_t value, char *text, size_t text_len);
 HASH_TYPE hash_crc_32 (char *message);
 #endif
 
+/*
 #define ASSERT_STACK(stack)                                          \
 {                                                                    \
 	int *code_err = stack_verification(stack, __func__);             \
@@ -99,5 +102,6 @@ HASH_TYPE hash_crc_32 (char *message);
 	}                                                                \
 	free(code_err);                                                  \
 }         
+*/ 
 
 #endif
